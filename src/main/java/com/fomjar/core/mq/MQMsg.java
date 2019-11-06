@@ -33,8 +33,8 @@ public class MQMsg {
     public String       tag()           {return this.tag;}
     public String       transaction()   {return this.transaction;}
     public byte[]       data()          {return this.data;}
-    public JSONObject   data2json()     {return JSONObject.parseObject(this.data2string());}
-    public String       data2string()   {return new String(this.data());}
+    public JSONObject   data2json()     {return null == this.data() ? null : JSONObject.parseObject(this.data2string());}
+    public String       data2string()   {return null == this.data() ? null : new String(this.data());}
 
     private MQMsg id(String id) {
         this.id = id;
@@ -44,7 +44,7 @@ public class MQMsg {
         this.time = time;
         return this;
     }
-    MQMsg tag(String tag) {
+    public MQMsg tag(String tag) {
         this.tag = tag;
         return this;
     }
@@ -57,7 +57,7 @@ public class MQMsg {
         return this;
     }
     public MQMsg data(String data) {
-        this.data = data.getBytes();
+        this.data = null == data ? null : data.getBytes();
         return this;
     }
 

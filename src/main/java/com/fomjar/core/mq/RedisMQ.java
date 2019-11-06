@@ -25,6 +25,8 @@ public class RedisMQ extends MQ {
     private int     db;
     /** redis操作对象 */
     private RedissonClient  redisson;
+    /** 解码器 */
+    private Codec   codec;
 
     public RedisMQ(String topic) {super(topic);}
 
@@ -61,8 +63,9 @@ public class RedisMQ extends MQ {
                 .setPassword(pass)
                 .setDatabase(db);
         this.redisson = Redisson.create(config);
+        this.codec = new StringCodec();
 
-        this.redisson.getTopic(this.topic(), new StringCodec()).addListener(String.class, (channel, msg) -> {
+        this.redisson.getTopic(this.topic(), this.codec).addListener(String.class, (channel, msg) -> {
             super.doConsume(MQMsg.fromString(JSONObject.parse(msg).toString()));
         });
     }
@@ -76,7 +79,7 @@ public class RedisMQ extends MQ {
 
     @Override
     protected MQ doProduce(MQMsg msg) {
-        this.redisson.getTopic(this.topic()).publish(msg.toString());
+        this.redisson.getTopic(this.topic(), this.codec).publish(msg.toString());
         return this;
     }
 
