@@ -3,6 +3,7 @@ package com.fomjar.core.mq;
 import com.alibaba.fastjson.JSONObject;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.Codec;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.config.Config;
 

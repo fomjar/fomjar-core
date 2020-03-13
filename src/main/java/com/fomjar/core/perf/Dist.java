@@ -71,9 +71,14 @@ public interface Dist {
     /**
      * 终止调度任务。包括循环任务、延迟任务、异步任务。
      *
-     * @param pattern
+     * @param name 任务名称，支持正则
      */
-    void revoke(String pattern);
+    void revoke(String name);
+
+    /**
+     * 终止整个系统中注册的所有调度任务，包括非本机注册的。
+     */
+    void revokeAll();
 
     /**
      * 分布式定时任务。一个任务名称只运行一个调度任务，后启动的任务会覆盖之前启动的同名任务。请确保每个独立的任务拥有独立唯一的名称。

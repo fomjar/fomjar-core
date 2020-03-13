@@ -16,57 +16,46 @@ public class TestDist {
 
     public static synchronized Dist dist() {
         if (null == dist)
-            dist = new RedissonDist("172.16.23.223", 6382, "zetsoft6382", 2);
+            dist = new RedissonDist("127.0.0.1", 6379, null, 0);
         return dist;
     }
 
-//    @BeforeClass
+    @BeforeClass
     public static void setup() {
         Logs.level(Level.INFO);
     }
 
-//    @Test
-    public void testLoop1() throws InterruptedException {
-        String timerName = "some-loop";
+    @Test
+    public void testLoopA() throws InterruptedException {
+        String timerName = "loop-a-123";
+        dist().revoke("loop-a-");
         dist().loop((Runnable & Serializable) () ->
-                System.out.println("loop-1-" + System.currentTimeMillis()),
+                System.out.println("loop-a-" + System.currentTimeMillis()),
                 timerName, 1, 1, TimeUnit.SECONDS);
-        Thread.sleep(300000);
-        dist().revoke(timerName);
+        Thread.sleep(10000);
+        dist().revoke("loop-a");
     }
 
-//    @Test
-    public void testLoop2() throws InterruptedException {
-        String timerName = "some-loop";
+    @Test
+    public void testLoopB() throws InterruptedException {
+        String timerName = "loop-b-123";
+        dist().revoke("loop-b-");
         dist().loop((Runnable & Serializable) () ->
-                System.out.println("loop-2-" + System.currentTimeMillis()),
+                        System.out.println("loop-b-" + System.currentTimeMillis()),
                 timerName, 1, 1, TimeUnit.SECONDS);
-        Thread.sleep(3000);
-        dist().revoke(timerName);
+        Thread.sleep(10000);
+        dist().revoke("loop-b");
     }
 
-//    @Test
-    public void testAyncAndLock() throws InterruptedException {
-        String lockName = "same-lock";
-        String taskName = "some-task";
-        dist().unlock(lockName);
-        for (int i = 0; i < 3; i++) {
-            dist().async((Runnable & Serializable) () -> {
-                try {
-                    dist().lock(() -> {
-                        System.out.println("== before ==");
-                        try {Thread.sleep(1000L);}
-                        catch (InterruptedException e) {e.printStackTrace();}
-                        System.out.println(System.currentTimeMillis());
-                        System.out.println("==  end   ==");
-                    }, lockName, 10, TimeUnit.HOURS);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }, taskName);
-        }
-        Thread.sleep(4 * 1000L);
-        dist().unlock(lockName);
+    @Test
+    public void testLoopC() throws InterruptedException {
+        String timerName = "loop-c-123";
+        dist().revoke("loop-c-");
+        dist().loop((Runnable & Serializable) () ->
+                        System.out.println("loop-c-" + System.currentTimeMillis()),
+                timerName, "0/1 * * * * ?");
+        Thread.sleep(10000);
+        dist().revoke("loop-c");
     }
 
 //    @Test

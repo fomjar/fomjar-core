@@ -27,7 +27,7 @@ public class TestEL {
             el.eval("if(1 > 0, 'grater', 'smaller')");  // 默认方法
             el.eval("Math.PI + " + i);      // 类静态常量
             el.eval("Math.abs(" + i + ")"); // 类静态方法
-            el.eval("valueOf(\"" + i + "\")");  // 静态Method方法
+            el.eval("valueOf('" + i + "')");  // 静态Method方法
             el.eval("abs(" + i + ")");      // 静态自定义方法
         }
         System.out.println(el.eval("'[ END  " + el.getClass().getSimpleName() + "] ' + now('yyyy/MM/dd HH:mm:ss.SSS')"));  // 默认方法

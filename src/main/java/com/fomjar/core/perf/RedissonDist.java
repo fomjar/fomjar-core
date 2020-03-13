@@ -125,14 +125,23 @@ public class RedissonDist implements Dist {
     }
 
     @Override
-    public void revoke(String pattern) {
-        Pattern pattern0 = Pattern.compile(pattern);
+    public void revoke(String name) {
+        Pattern pattern = Pattern.compile(name);
         this.tasks().entrySet()
                 .stream()
                 .map(Map.Entry::getKey)
-                .filter(name -> pattern0.matcher(name).find())
+                .filter(n -> pattern.matcher(n).find())
                 .collect(Collectors.toList())
                 .forEach(this::delTask);
+    }
+
+    @Override
+    public void revokeAll() {
+        if (null != this.task)
+            this.task.delete();
+
+        this.tasks().clear();
+        this.task = null;
     }
 
     @Override
