@@ -1,4 +1,4 @@
-package com.fomjar.core.perf;
+package com.fomjar.core.async;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,18 +13,11 @@ import java.util.stream.Collectors;
  */
 public class QueuedExecutor implements ExecutorService {
 
+    private static final AtomicLong ID = new AtomicLong(1);
     /**
      * 主队列执行器。
      */
     public static final QueuedExecutor main = new QueuedExecutor();
-
-    private static AtomicLong ID = new AtomicLong(1);
-    private static long nextID() {
-        if (null == QueuedExecutor.ID)
-            QueuedExecutor.ID = new AtomicLong(1);
-
-        return QueuedExecutor.ID.getAndIncrement();
-    }
 
     private String name;
     private boolean run;
@@ -32,7 +25,7 @@ public class QueuedExecutor implements ExecutorService {
     private FutureTask<?> current;
 
     public QueuedExecutor() {
-        this("queued-executor-" + QueuedExecutor.nextID());
+        this("queued-executor-" + QueuedExecutor.ID.getAndIncrement());
     }
 
     public QueuedExecutor(String name) {

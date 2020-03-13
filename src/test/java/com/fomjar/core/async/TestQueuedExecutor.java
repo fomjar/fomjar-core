@@ -1,15 +1,15 @@
-package com.fomjar.core.perf;
+package com.fomjar.core.async;
 
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-public class TestExecutor {
+public class TestQueuedExecutor {
 
     @Test
     public void testNew() throws InterruptedException {
         QueuedExecutor executor = new QueuedExecutor();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 5; i++) {
             final int n = i;
             executor.submit(() -> {
                 try {Thread.sleep(100L);}
@@ -23,7 +23,7 @@ public class TestExecutor {
 
     @Test
     public void testMain() throws InterruptedException {
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 5; i++) {
             final int n = i;
             QueuedExecutor.main.submit(() -> {
                 try {Thread.sleep(100L);}
@@ -31,7 +31,7 @@ public class TestExecutor {
                 System.out.println("task-" + n);
             });
         }
-        Thread.sleep(2100L);
+        QueuedExecutor.main.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
     }
 
 }

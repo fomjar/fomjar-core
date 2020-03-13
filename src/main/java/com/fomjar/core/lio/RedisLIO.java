@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class RedissonLIO extends LIO {
+public class RedisLIO extends LIO {
 
     private String          channel;
     private RedissonClient  redisson;
@@ -16,7 +16,7 @@ public class RedissonLIO extends LIO {
     private byte[]          buf;
     private boolean         isOpen;
 
-    public RedissonLIO(RedissonClient redisson, String channel) throws IOException {
+    public RedisLIO(RedissonClient redisson, String channel) throws IOException {
         this.channel = channel;
         this.handler(redisson);
     }

@@ -1,4 +1,4 @@
-package com.fomjar.core.perf;
+package com.fomjar.core.dist;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;

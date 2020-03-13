@@ -52,18 +52,27 @@ public class RedisMQ extends MQ {
         this.pass   = pass;
         this.db     = db;
 
-        this.initConsumer();
-
-        return this;
-    }
-
-    private void initConsumer() {
         Config config = new Config();
         config.useSingleServer()
                 .setAddress("redis://" + this.host + ":" + this.port)
                 .setPassword(pass)
                 .setDatabase(db);
         this.redisson = Redisson.create(config);
+
+        this.initConsumer();
+
+        return this;
+    }
+
+    public RedisMQ setup(RedissonClient redissonClient) {
+        this.redisson = redissonClient;
+
+        this.initConsumer();
+
+        return this;
+    }
+
+    private void initConsumer() {
         this.codec = new StringCodec();
 
         this.redisson.getTopic(this.topic(), this.codec).addListener(String.class, (channel, msg) -> {

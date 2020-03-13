@@ -1,6 +1,4 @@
-package com.fomjar.core.eq;
-
-import com.fomjar.core.perf.QueuedExecutor;
+package com.fomjar.core.async;
 
 import java.util.HashMap;
 import java.util.LinkedList;

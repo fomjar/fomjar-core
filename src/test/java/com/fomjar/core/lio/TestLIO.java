@@ -1,22 +1,12 @@
 package com.fomjar.core.lio;
 
-import ch.qos.logback.classic.Level;
-import com.fomjar.core.log.Logs;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class TestLIO {
-
-    @BeforeClass
-    public static void setup() {
-        Logs.level(Level.INFO);
-    }
 
     @Test
     public void restWebSocketLIO() throws InterruptedException {

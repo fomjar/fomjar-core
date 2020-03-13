@@ -1,4 +1,4 @@
-package com.fomjar.core.eq;
+package com.fomjar.core.async;
 
 import org.junit.Test;
 

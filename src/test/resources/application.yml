@@ -1,0 +1,16 @@
+fomjar:
+  core:
+    redis:
+      host: 127.0.0.1
+#      port:
+#      pass:
+#      db:
+    mq:
+      topic: fomjar
+      group: core
+#    oss:
+#      type: minio
+#      type: aliyun
+#      ep:
+#      ak:
+#      sk:

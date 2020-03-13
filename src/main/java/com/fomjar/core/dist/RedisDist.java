@@ -1,4 +1,4 @@
-package com.fomjar.core.perf;
+package com.fomjar.core.dist;
 
 import org.redisson.Redisson;
 import org.redisson.RedissonNode;
@@ -13,12 +13,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class RedissonDist implements Dist {
+public class RedisDist implements Dist {
 
     private RedissonClient  redissonClient;
     private RedissonNode    redissonNode;
 
-    public RedissonDist(String host, int port, String pass, int db) {
+    public RedisDist(String host, int port, String pass, int db) {
         Config config = new Config();
         config.useSingleServer()
                 .setAddress("redis://" + host + ":" + port)
@@ -27,6 +27,13 @@ public class RedissonDist implements Dist {
         this.redissonClient = Redisson.create(config);
 
         this.redissonNode = RedissonNode.create(new RedissonNodeConfig(config), this.redissonClient());
+        this.redissonNode().start();
+    }
+
+    public RedisDist(RedissonClient redissonClient) {
+        this.redissonClient = redissonClient;
+
+        this.redissonNode = RedissonNode.create(new RedissonNodeConfig(this.redissonClient().getConfig()), this.redissonClient());
         this.redissonNode().start();
     }
 
@@ -39,7 +46,7 @@ public class RedissonDist implements Dist {
     }
 
     private RLock lock(String name) {
-        return this.redissonClient().getLock("perf-lock-" + name);
+        return this.redissonClient().getLock("dist-lock-" + name);
     }
 
     @Override
@@ -98,14 +105,14 @@ public class RedissonDist implements Dist {
         }
     }
 
-    private static final String TASK_MAP = "perf-task";
+    private static final String TASK_MAP = "dist-task";
 
     private RScheduledExecutorService task = null;
     private RScheduledExecutorService task() {
         if (null == this.task) {
             synchronized (this) {
                 if (null == this.task) {
-                    this.task = this.redissonClient().getExecutorService(RedissonDist.TASK_MAP);
+                    this.task = this.redissonClient().getExecutorService(RedisDist.TASK_MAP);
                     this.task.registerWorkers(Integer.MAX_VALUE / 2);
                 }
             }
@@ -113,7 +120,7 @@ public class RedissonDist implements Dist {
         return this.task;
     }
     private RMap<String, String> tasks() {
-        return this.redissonClient().getMap(RedissonDist.TASK_MAP);
+        return this.redissonClient().getMap(RedisDist.TASK_MAP);
     }
     private void addTask(String name, String task) {
         this.tasks().put(name, task);
