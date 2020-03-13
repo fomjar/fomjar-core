@@ -126,6 +126,7 @@ public class PIO {
     }
 
     /**
+     * 打印器，用于写入数据。
      *
      * @return
      */

@@ -45,7 +45,7 @@ public class TestLIO {
                 }
                 for (int i = 0; i < 3; i++) {
                     lio.write("hello server!");
-                    Thread.sleep(1000L);
+                    Thread.sleep(200L);
                 }
                 lio.close();
             } catch (IOException | InterruptedException | URISyntaxException e) {

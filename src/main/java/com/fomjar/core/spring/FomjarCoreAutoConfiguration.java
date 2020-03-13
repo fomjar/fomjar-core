@@ -1,5 +1,6 @@
 package com.fomjar.core.spring;
 
+import com.fomjar.core.async.EventQueue;
 import com.fomjar.core.dist.Dist;
 import com.fomjar.core.dist.RedisDist;
 import com.fomjar.core.mq.MQ;
@@ -24,6 +25,11 @@ public class FomjarCoreAutoConfiguration {
     private static <T> T ifnull(Object t0, T t1) {
         if (null != t0) return (T) t1.getClass().cast(t0);
         return t1;
+    }
+
+    @Bean
+    public EventQueue eventQueue() {
+        return EventQueue.main;
     }
 
     @Bean
@@ -68,18 +74,20 @@ public class FomjarCoreAutoConfiguration {
             prefix + ".oss.ep",
             prefix + ".oss.ak",
             prefix + ".oss.sk",
+            prefix + ".oss.bucket",
     })
     public OSS oss() {
         String type = Props.get(prefix + ".oss.type");
         String ep   = Props.get(prefix + ".oss.ep");
         String ak   = Props.get(prefix + ".oss.ak");
         String sk   = Props.get(prefix + ".oss.sk");
+        String bucket   = Props.get(prefix + ".oss.bucket");
 
         switch (type.trim().toLowerCase()) {
             case "aliyun":
-                return new AliyunOSS().setup(ep, ak, sk);
+                return new AliyunOSS().setup(ep, ak, sk).bucket(bucket);
             case "minio":
-                return new MinioOSS().setup(ep, ak, sk);
+                return new MinioOSS().setup(ep, ak, sk).bucket(bucket);
             default:
                 throw new InvalidPropertyException(String.class, prefix + ".oss.type", "Invalid oss type: " + type);
         }

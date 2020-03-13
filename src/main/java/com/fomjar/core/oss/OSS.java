@@ -120,7 +120,7 @@ public abstract class OSS {
 
         if (!file.contains(".")) return defaultType;
 
-        switch (file.substring(file.lastIndexOf("."))) {
+        switch (file.substring(file.lastIndexOf(".")).toLowerCase()) {
             case ".*":      return "application/octet-stream";
             case ".001":    return "application/x-001";
             case ".301":    return "application/x-301";

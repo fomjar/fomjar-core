@@ -1,7 +1,9 @@
 package com.fomjar.core.dist;
 
+import com.fomjar.core.TestFomjarCoreApplication;
 import com.fomjar.core.el.AviatorEL;
 import com.fomjar.core.el.EL;
+import com.fomjar.core.spring.Beans;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,7 @@ import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {TestApplication.class})
+@SpringBootTest(classes = {TestFomjarCoreApplication.class})
 public class TestDist {
 
     @Autowired
@@ -24,8 +26,8 @@ public class TestDist {
         this.dist.revoke("loop-a-");
         this.dist.loop((Runnable & Serializable) () ->
                         System.out.println(Thread.currentThread().getName() + "-loop-a-" + System.currentTimeMillis()),
-                timerName, 1, 1, TimeUnit.SECONDS);
-        Thread.sleep(3000L);
+                timerName, 100, 1000, TimeUnit.MILLISECONDS);
+        Thread.sleep(1000L);
         this.dist.revoke("loop-a-");
     }
 
@@ -35,8 +37,8 @@ public class TestDist {
         this.dist.revoke("loop-b-");
         this.dist.loop((Runnable & Serializable) () ->
                         System.out.println(Thread.currentThread().getName() + "-loop-b-" + System.currentTimeMillis()),
-                timerName, 1, 1, TimeUnit.SECONDS);
-        Thread.sleep(3000L);
+                timerName, 100, 1000, TimeUnit.MILLISECONDS);
+        Thread.sleep(1000L);
         this.dist.revoke("loop-b-");
     }
 
@@ -49,6 +51,28 @@ public class TestDist {
                 timerName, "0/1 * * * * ?");
         Thread.sleep(3000L);
         this.dist.revoke("loop-c-");
+    }
+
+    @Test
+    public void testLock() throws InterruptedException {
+        String name = "123";
+        for (int i = 0; i < 3; i++) {
+            this.dist.async((Runnable & Serializable) () -> {
+                try {
+                    Beans.get(Dist.class).lock(() -> {
+                        System.out.println(Thread.currentThread().getName() + ": " + System.currentTimeMillis());
+                        try {
+                            Thread.sleep(100L);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }, name,5, TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }, name + "-" + i);
+        }
+        Thread.sleep(2000L);
     }
 
     @Test

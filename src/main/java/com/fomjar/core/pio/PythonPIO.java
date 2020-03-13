@@ -1,7 +1,6 @@
 package com.fomjar.core.pio;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  * Python的PIO实现。封装了一些方便python使用的方法。

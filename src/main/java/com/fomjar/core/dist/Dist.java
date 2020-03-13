@@ -76,11 +76,6 @@ public interface Dist {
     void revoke(String name);
 
     /**
-     * 终止整个系统中注册的所有调度任务，包括非本机注册的。
-     */
-    void revokeAll();
-
-    /**
      * 分布式定时任务。一个任务名称只运行一个调度任务，后启动的任务会覆盖之前启动的同名任务。请确保每个独立的任务拥有独立唯一的名称。
      *
      * @param runnable
@@ -133,7 +128,7 @@ public interface Dist {
      * @return
      */
     default Future<?> async(Runnable runnable, String name) {
-        return this.delay(runnable, name, 0, TimeUnit.SECONDS);
+        return this.delay(runnable, name, 1, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -145,7 +140,7 @@ public interface Dist {
      * @return
      */
     default <T> Future<T> async(Callable<T> callable, String name) {
-        return this.delay(callable, name, 0, TimeUnit.SECONDS);
+        return this.delay(callable, name, 1, TimeUnit.MILLISECONDS);
     }
 
     /**

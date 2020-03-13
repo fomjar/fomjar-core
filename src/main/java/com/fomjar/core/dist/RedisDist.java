@@ -26,13 +26,16 @@ public class RedisDist implements Dist {
                 .setDatabase(db);
         this.redissonClient = Redisson.create(config);
 
-        this.redissonNode = RedissonNode.create(new RedissonNodeConfig(config), this.redissonClient());
-        this.redissonNode().start();
+        this.setup();
     }
 
     public RedisDist(RedissonClient redissonClient) {
         this.redissonClient = redissonClient;
 
+        this.setup();
+    }
+
+    private void setup() {
         this.redissonNode = RedissonNode.create(new RedissonNodeConfig(this.redissonClient().getConfig()), this.redissonClient());
         this.redissonNode().start();
     }
@@ -140,15 +143,6 @@ public class RedisDist implements Dist {
                 .filter(n -> pattern.matcher(n).find())
                 .collect(Collectors.toList())
                 .forEach(this::delTask);
-    }
-
-    @Override
-    public void revokeAll() {
-        if (null != this.task)
-            this.task.delete();
-
-        this.tasks().clear();
-        this.task = null;
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public class QueuedExecutor implements ExecutorService {
 
     private static final AtomicLong ID = new AtomicLong(1);
+
     /**
      * 主队列执行器。
      */
