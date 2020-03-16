@@ -9,10 +9,11 @@ public class Async {
 
     public static final ExecutorService queue   = QueuedExecutor.main;
     public static       ExecutorService pool    = null;
+    public static final int DEFAULT_POOL_SIZE   = 10;
 
     private static void check() {
         if (null == Async.pool)
-            Async.pool = Executors.newScheduledThreadPool(10,
+            Async.pool = Executors.newScheduledThreadPool(Async.DEFAULT_POOL_SIZE,
                     new SimpleThreadFactory("main-pool"));
     }
 

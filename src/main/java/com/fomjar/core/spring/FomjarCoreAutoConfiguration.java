@@ -57,19 +57,19 @@ public class FomjarCoreAutoConfiguration {
         return EventQueue.main;
     }
 
-    @Bean("queue")
+    @Bean
     @Lazy
-    public ExecutorService queuedExecutor() {
+    public ExecutorService queue() {
         return QueuedExecutor.main;
     }
 
-    @Bean("pool")
+    @Bean
     @Lazy
-    public ExecutorService poolExecutor() {
+    public ExecutorService pool() {
         return null != Async.pool
                 ? Async.pool
                 : (Async.pool = Executors.newScheduledThreadPool(
-                    ifnull(Props.get(prefix + ".pool.size"), 10),
+                    ifnull(Props.get(prefix + ".pool.size"), Async.DEFAULT_POOL_SIZE),
                     new SimpleThreadFactory("main-pool")));
     }
 
@@ -77,11 +77,11 @@ public class FomjarCoreAutoConfiguration {
     @ConditionalOnProperty({
             prefix + ".redis.host",
     })
-    public RedissonClient redissonClient() {
+    public RedissonClient redisson() {
         String  host    = ifnull(Props.get(prefix + ".redis.host"), "127.0.0.1");
         int     port    = ifnull(Props.get(prefix + ".redis.port"), 6379);
         String  pass    = ifnull(Props.get(prefix + ".redis.pass"), null);
-        int     db      = ifnull(Props.get(prefix + ".redis.db"), 0);
+        int     db      = ifnull(Props.get(prefix + ".redis.db"),   0);
 
         Config config = new Config();
         config.useSingleServer()
@@ -93,7 +93,7 @@ public class FomjarCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnBean(RedissonClient.class)
-    public Dist redisDist() {
+    public Dist dist() {
         return new RedisDist(Beans.get(RedissonClient.class));
     }
 
@@ -103,7 +103,7 @@ public class FomjarCoreAutoConfiguration {
             prefix + ".mq.topic",
             prefix + ".mq.group",
     })
-    public MQ redisMQ() {
+    public MQ mq() {
         String topic = Props.get(prefix + ".mq.topic");
         String group = Props.get(prefix + ".mq.group");
         return new RedisMQ(topic).setup(Beans.get(RedissonClient.class)).group(group);

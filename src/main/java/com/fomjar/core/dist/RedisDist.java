@@ -62,8 +62,7 @@ public class RedisDist implements Dist {
         RLock lock = this.lock(name);
         try {
             lock.lock(lease, unit);
-            try     {
-                task.run();}
+            try     {task.run();}
             catch   (Exception e) {throw e;}
         } finally {
             lock.unlock();

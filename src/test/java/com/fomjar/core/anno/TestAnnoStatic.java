@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
-public class TestAnno {
+public class TestAnnoStatic {
 
     @Test
     public void test() throws IOException, ClassNotFoundException {

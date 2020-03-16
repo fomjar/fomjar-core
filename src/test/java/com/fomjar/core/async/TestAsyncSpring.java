@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class TestAsyncSpring {
 
     @Autowired
-    private EventQueue eq;
+    private EventQueue eventQueue;
 
     @Autowired
     private ExecutorService queue;
@@ -24,25 +24,25 @@ public class TestAsyncSpring {
     private ExecutorService pool;
 
     @Test
-    public void testEvent() throws InterruptedException {
-        this.eq.sub("IntegerEvent", (String name, Integer data) -> {
+    public void testEventQueue() throws InterruptedException {
+        this.eventQueue.sub("IntegerEvent", (String name, Integer data) -> {
             System.out.println(Thread.currentThread().getName() + ": " + name + "-" + data);
         });
-        this.eq.sub("StringEvent", (String name, String data) -> {
+        this.eventQueue.sub("StringEvent", (String name, String data) -> {
             System.out.println(Thread.currentThread().getName() + ": " + name + "-" + data);
         });
-        this.eq.sub("ArrayEvent", (String name, Integer[] data) -> {
+        this.eventQueue.sub("ArrayEvent", (String name, Integer[] data) -> {
             System.out.println(Thread.currentThread().getName() + ": " + name + "-" + data);
         });
-        this.eq.sub("ObjectEvent", (String name, Object data) -> {
+        this.eventQueue.sub("ObjectEvent", (String name, Object data) -> {
             System.out.println(Thread.currentThread().getName() + ": " + name + "-" + data);
         });
 
         for (int i = 0; i < 2; i++) {
-            this.eq.pub("IntegerEvent", 3);
-            this.eq.pub("StringEvent", "Hello World!");
-            this.eq.pub("ArrayEvent", new Integer[]{1, 2, 3});
-            this.eq.pub("ObjectEvent", null);
+            this.eventQueue.pub("IntegerEvent", 3);
+            this.eventQueue.pub("StringEvent", "Hello World!");
+            this.eventQueue.pub("ArrayEvent", new Integer[]{1, 2, 3});
+            this.eventQueue.pub("ObjectEvent", null);
         }
 
         Thread.sleep(1000L);

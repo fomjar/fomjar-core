@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static com.fomjar.core.async.Async.*;
 
-public class TestAsyncBlock {
+public class TestAsyncStatic {
 
     @Test
     public void test() {
