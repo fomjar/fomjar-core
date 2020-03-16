@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
  */
 public class QueuedExecutor implements ExecutorService {
 
-    private static final AtomicLong ID = new AtomicLong(1);
+    private static final AtomicLong ID = new AtomicLong(0);
 
     /**
      * 主队列执行器。
      */
-    public static final QueuedExecutor main = new QueuedExecutor();
+    public static final QueuedExecutor main = new QueuedExecutor("main-queue");
 
     private String name;
     private boolean run;

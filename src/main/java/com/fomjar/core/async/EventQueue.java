@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -23,59 +24,56 @@ public class EventQueue {
      *
      * @param <T>
      */
-    public interface Listener<T> {
+    public interface EventListener<T> {
 
-        void on(String name, T data);
+        void on(String event, T data);
 
     }
+
+    private static final AtomicLong ID = new AtomicLong(0);
 
     /**
      * 主事件队列。
      */
     public static final EventQueue main = new EventQueue("main-event-queue");
 
-
-    private static AtomicLong ID = new AtomicLong(1);
-    private static long nextID() {
-        if (null == EventQueue.ID)
-            EventQueue.ID = new AtomicLong(1);
-
-        return EventQueue.ID.getAndIncrement();
-    }
-
-    private Map<String, List<Listener<?>>> listeners;
+    private Map<String, List<EventListener<?>>> listeners;
     private ReadWriteLock   lock;
-    private QueuedExecutor  executor;
+    private ExecutorService executor;
 
     public EventQueue() {
-        this("event-queue-" + EventQueue.nextID());
+        this("event-queue-" + EventQueue.ID.getAndIncrement());
     }
 
     public EventQueue(String name) {
-        this.listeners  = new HashMap<>();
-        this.lock       = new ReentrantReadWriteLock();
-        this.executor   = new QueuedExecutor(name);
+        this(new QueuedExecutor(name));
     }
 
-    public <T> void pub(String name, T data) {
+    public EventQueue(ExecutorService executor) {
+        this.listeners  = new HashMap<>();
+        this.lock       = new ReentrantReadWriteLock();
+        this.executor   = executor;
+    }
+
+    public <T> void pub(String event, T data) {
         this.executor.submit(() -> {
             Lock lock = this.lock.readLock();
             try {
                 lock.lock();
-                if (!this.listeners.containsKey(name)) return;
-                this.listeners.get(name).forEach(listener -> ((Listener<T>) listener).on(name, data));
+                if (!this.listeners.containsKey(event)) return;
+                this.listeners.get(event).forEach(listener -> ((EventListener<T>) listener).on(event, data));
             } finally {
                 lock.unlock();
             }
         });
     }
 
-    public void sub(String name, Listener<?> listener) {
+    public void sub(String event, EventListener<?> listener) {
         Lock lock = this.lock.writeLock();
         try {
             lock.lock();
-            this.listeners.putIfAbsent(name, new LinkedList<>());
-            this.listeners.get(name).add(listener);
+            this.listeners.putIfAbsent(event, new LinkedList<>());
+            this.listeners.get(event).add(listener);
         } finally {
             lock.unlock();
         }

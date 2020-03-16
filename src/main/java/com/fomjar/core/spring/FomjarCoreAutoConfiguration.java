@@ -1,8 +1,14 @@
 package com.fomjar.core.spring;
 
+import com.fomjar.core.async.Async;
 import com.fomjar.core.async.EventQueue;
+import com.fomjar.core.async.QueuedExecutor;
+import com.fomjar.core.async.SimpleThreadFactory;
 import com.fomjar.core.dist.Dist;
 import com.fomjar.core.dist.RedisDist;
+import com.fomjar.core.el.AviatorEL;
+import com.fomjar.core.el.EL;
+import com.fomjar.core.el.FreeMarkerEL;
 import com.fomjar.core.mq.MQ;
 import com.fomjar.core.mq.RedisMQ;
 import com.fomjar.core.oss.AliyunOSS;
@@ -16,6 +22,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Configuration
 public class FomjarCoreAutoConfiguration {
@@ -28,8 +38,39 @@ public class FomjarCoreAutoConfiguration {
     }
 
     @Bean
+    @Lazy
+    public EL el() {
+        String type = ifnull(Props.get(prefix + ".el.type"), "aviator");
+        switch (type) {
+            case "aviator":
+                return new AviatorEL();
+            case "freemarker":
+                return new FreeMarkerEL();
+            default:
+                throw new InvalidPropertyException(String.class, prefix + ".el.type", "Invalid el type: " + type);
+        }
+    }
+
+    @Bean
+    @Lazy
     public EventQueue eventQueue() {
         return EventQueue.main;
+    }
+
+    @Bean("queue")
+    @Lazy
+    public ExecutorService queuedExecutor() {
+        return QueuedExecutor.main;
+    }
+
+    @Bean("pool")
+    @Lazy
+    public ExecutorService poolExecutor() {
+        return null != Async.pool
+                ? Async.pool
+                : (Async.pool = Executors.newScheduledThreadPool(
+                    ifnull(Props.get(prefix + ".pool.size"), 10),
+                    new SimpleThreadFactory("main-pool")));
     }
 
     @Bean

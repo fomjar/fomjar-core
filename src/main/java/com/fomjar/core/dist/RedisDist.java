@@ -58,11 +58,12 @@ public class RedisDist implements Dist {
     }
 
     @Override
-    public void lock(Runnable runnable, String name, long lease, TimeUnit unit) throws Exception {
+    public void lock(Runnable task, String name, long lease, TimeUnit unit) throws Exception {
         RLock lock = this.lock(name);
         try {
             lock.lock(lease, unit);
-            try     {runnable.run();}
+            try     {
+                task.run();}
             catch   (Exception e) {throw e;}
         } finally {
             lock.unlock();
@@ -70,11 +71,11 @@ public class RedisDist implements Dist {
     }
 
     @Override
-    public <T> T lock(Callable<T> callable, String name, long lease, TimeUnit unit) throws Exception {
+    public <T> T lock(Callable<T> task, String name, long lease, TimeUnit unit) throws Exception {
         RLock lock = this.lock(name);
         try {
             lock.lock(lease, unit);
-            try     {return callable.call();}
+            try     {return task.call();}
             catch   (Exception e) {throw e;}
         } finally {
             lock.unlock();
@@ -82,11 +83,12 @@ public class RedisDist implements Dist {
     }
 
     @Override
-    public void lock(Runnable runnable, String name, long wait, long lease, TimeUnit unit) throws Exception {
+    public void lock(Runnable task, String name, long wait, long lease, TimeUnit unit) throws Exception {
         RLock lock = this.lock(name);
         try {
             if (lock.tryLock(wait, lease, unit)) {
-                try     {runnable.run();}
+                try     {
+                    task.run();}
                 catch   (Exception e) {throw e;}
             }
         } finally {
@@ -95,11 +97,11 @@ public class RedisDist implements Dist {
     }
 
     @Override
-    public <T> T lock(Callable<T> callable, String name, long wait, long lease, TimeUnit unit) throws Exception {
+    public <T> T lock(Callable<T> task, String name, long wait, long lease, TimeUnit unit) throws Exception {
         RLock lock = this.lock(name);
         try {
             if (lock.tryLock(wait, lease, unit)) {
-                try     {return callable.call();}
+                try     {return task.call();}
                 catch   (Exception e) {throw e;}
             }
             return null;
@@ -135,8 +137,8 @@ public class RedisDist implements Dist {
     }
 
     @Override
-    public void revoke(String name) {
-        Pattern pattern = Pattern.compile(name);
+    public void revoke(String task) {
+        Pattern pattern = Pattern.compile(task);
         this.tasks().entrySet()
                 .stream()
                 .map(Map.Entry::getKey)
@@ -146,11 +148,11 @@ public class RedisDist implements Dist {
     }
 
     @Override
-    public Future<?> loop(Runnable runnable, String name, String cron) {
+    public Future<?> loop(Runnable task, String name, String cron) {
         try {
             return this.lock((Callable<Future<?>>) () -> {
                 this.delTask(name);
-                RScheduledFuture<?> future = this.task().scheduleAsync(runnable, CronSchedule.of(cron));
+                RScheduledFuture<?> future = this.task().scheduleAsync(task, CronSchedule.of(cron));
                 this.addTask(name, future.getTaskId());
                 return future;
             }, name, 1, TimeUnit.MINUTES);
@@ -159,11 +161,11 @@ public class RedisDist implements Dist {
     }
 
     @Override
-    public Future<?> loop(Runnable runnable, String name, long delay, long period, TimeUnit unit) {
+    public Future<?> loop(Runnable task, String name, long delay, long period, TimeUnit unit) {
         try {
             return this.lock((Callable<Future<?>>) () -> {
                 this.delTask(name);
-                RScheduledFuture<?> future = this.task().scheduleAtFixedRateAsync(runnable, delay, period, unit);
+                RScheduledFuture<?> future = this.task().scheduleAtFixedRateAsync(task, delay, period, unit);
                 this.addTask(name, future.getTaskId());
                 return future;
             }, name, 1, TimeUnit.MINUTES);
@@ -172,11 +174,11 @@ public class RedisDist implements Dist {
     }
 
     @Override
-    public Future<?> delay(Runnable runnable, String name, long delay, TimeUnit unit) {
+    public Future<?> delay(Runnable task, String name, long delay, TimeUnit unit) {
         try {
             return this.lock((Callable<Future<?>>) () -> {
                 this.delTask(name);
-                RScheduledFuture<?> future = this.task().scheduleAsync(runnable, delay, unit);
+                RScheduledFuture<?> future = this.task().scheduleAsync(task, delay, unit);
                 this.addTask(name, future.getTaskId());
                 return future;
             }, name, 1, TimeUnit.MINUTES);
@@ -185,11 +187,11 @@ public class RedisDist implements Dist {
     }
 
     @Override
-    public <T> Future<T> delay(Callable<T> callable, String name, long delay, TimeUnit unit) {
+    public <T> Future<T> delay(Callable<T> task, String name, long delay, TimeUnit unit) {
         try {
             return this.lock((Callable<Future<T>>) () -> {
                 this.delTask(name);
-                RScheduledFuture<T> future = this.task().scheduleAsync(callable, delay, unit);
+                RScheduledFuture<T> future = this.task().scheduleAsync(task, delay, unit);
                 this.addTask(name, future.getTaskId());
                 return future;
             }, name, 1, TimeUnit.MINUTES);

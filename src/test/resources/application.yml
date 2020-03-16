@@ -1,7 +1,12 @@
 fomjar:
   core:
-    redis:
-      host: 127.0.0.1
+#    pool:
+#      size: 10
+#    el:
+#      type: aviator
+#      type: freemarker
+#    redis:
+#      host: 127.0.0.1
 #      port:
 #      pass:
 #      db:

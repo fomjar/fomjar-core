@@ -1,19 +1,22 @@
 package com.fomjar.core.el;
 
+import com.fomjar.core.TestFomjarCoreApplication;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {TestFomjarCoreApplication.class})
 public class TestEL {
 
-    @Test
-    public void testFreeMarkerEL() throws Exception {
-        this.testEL(new FreeMarkerEL());
-        assert true;
-    }
-
+    @Autowired
+    private EL el;
 
     @Test
-    public void testAviatorEL() throws Exception {
-        this.testEL(new AviatorEL());
+    public void test() throws Exception {
+        this.testEL(el);
         assert true;
     }
 

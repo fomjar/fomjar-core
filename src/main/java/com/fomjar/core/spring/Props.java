@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
- * Easy Property. Easy to get property.
+ * Spring properties toolkit.
  *
  * @author fomjar
  */

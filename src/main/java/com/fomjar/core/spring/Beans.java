@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
- * Easy Bean. Easy to get bean.
+ * Spring bean toolkit.
  *
  * @author fomjar
  */
@@ -20,12 +20,12 @@ public class Beans implements ApplicationContextAware {
         Beans.applicationContext = applicationContext;
     }
 
-    public static Object get(String name) {
-        return Beans.applicationContext.getBean(name);
-    }
-
     public static <T> T get(Class<T> clazz) {
         return Beans.applicationContext.getBean(clazz);
+    }
+
+    public static Object get(String name) {
+        return Beans.applicationContext.getBean(name);
     }
 
     public static <T> T get(String name, Class<T> clazz) {
