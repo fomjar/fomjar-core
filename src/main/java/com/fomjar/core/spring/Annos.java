@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Spring bean toolkit.
+ * DIY annotation auto-scan.
  *
  * @author fomjar
  */

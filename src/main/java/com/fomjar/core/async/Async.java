@@ -5,6 +5,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * 异步执行期汇总工具集。<br/>
+ * 推荐用<code>
+ *     import static com.fomjar.core.async.Async.*;
+ * </code>
+ * 的方式来调用。
+ */
 public class Async {
 
     public static final ExecutorService queue   = QueuedExecutor.main;

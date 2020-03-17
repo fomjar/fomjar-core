@@ -5,7 +5,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 分布式支持。
+ * 分布式工具集。
  *
  * @author fomjar
  */

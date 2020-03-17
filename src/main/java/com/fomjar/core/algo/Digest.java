@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
-public class Digest {
+public abstract class Digest {
 
     public static String md2(byte[] bytes)                      {return DigestUtils.md2Hex(bytes);}
     public static String md2(InputStream is) throws IOException {return DigestUtils.md2Hex(is);}
