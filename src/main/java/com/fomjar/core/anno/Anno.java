@@ -10,6 +10,7 @@ import org.springframework.core.type.classreading.SimpleMetadataReaderFactory;
 import org.springframework.util.ClassUtils;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -26,7 +27,6 @@ public abstract class Anno {
     private static final ResourcePatternResolver    res = new PathMatchingResourcePatternResolver();
     private static final MetadataReaderFactory      reg = new SimpleMetadataReaderFactory();
     private static final PropertyResolver           env = new StandardEnvironment();
-
 
     /**
      * 扫描指定包下的注解。
@@ -90,6 +90,64 @@ public abstract class Anno {
 
             reader.read(field.getAnnotations(), clazz, field);
         }
+    }
+
+    private static boolean match(Annotation[] src, Class<? extends Annotation>[] dst) {
+        for (Class<? extends Annotation> anno0 : dst) {
+            boolean have = false;
+            for (Annotation anno1 : src) {
+                if (anno0.isAssignableFrom(anno1.annotationType())) {
+                    have = true;
+                    break;
+                }
+            }
+            if (!have) return false;
+        }
+        return true;
+    }
+
+    /**
+     * 判断注解是否匹配。
+     *
+     * @param clazz
+     * @param annotations
+     * @return
+     */
+    public static boolean match(Class clazz, Class<? extends Annotation>... annotations) {
+        return Anno.match(clazz.getAnnotations(), annotations);
+    }
+
+    /**
+     * 判断注解是否匹配。
+     *
+     * @param method
+     * @param annotations
+     * @return
+     */
+    public static boolean match(Method method, Class<? extends Annotation>... annotations) {
+        return Anno.match(method.getAnnotations(), annotations);
+    }
+
+    /**
+     * 判断注解是否匹配。
+     *
+     * @param parameter
+     * @param annotations
+     * @return
+     */
+    public static boolean match(Parameter parameter, Class<? extends Annotation>... annotations) {
+        return Anno.match(parameter.getAnnotations(), annotations);
+    }
+
+    /**
+     * 判断注解是否匹配。
+     *
+     * @param field
+     * @param annotations
+     * @return
+     */
+    public static boolean match(Field field, Class<? extends Annotation>... annotations) {
+        return Anno.match(field.getAnnotations(), annotations);
     }
 
 }

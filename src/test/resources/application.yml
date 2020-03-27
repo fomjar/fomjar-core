@@ -2,7 +2,6 @@ fomjar:
   core:
 #    pool:
 #      size: 10
-    anno: com.fomjar.core
 #    el:
 #      type: aviator
 #      type: freemarker

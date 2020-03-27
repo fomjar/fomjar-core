@@ -10,14 +10,14 @@ import java.lang.reflect.Parameter;
  *
  * @author fomjar
  */
-public interface AnnoReader {
+public interface AnnoReader<T> {
 
-    void read(Annotation[] annos, Class clazz);
+    void read(Annotation[] annotations, Class<T> clazz);
 
-    void read(Annotation[] annos, Class clazz, Method method);
+    void read(Annotation[] annotations, Class<T> clazz, Method method);
 
-    void read(Annotation[] annos, Class clazz, Method method, Parameter parameter);
+    void read(Annotation[] annotations, Class<T> clazz, Method method, Parameter parameter);
 
-    void read(Annotation[] annos, Class clazz, Field field);
+    void read(Annotation[] annotations, Class<T> clazz, Field field);
 
 }
