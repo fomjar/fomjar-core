@@ -40,9 +40,9 @@ public abstract class Anno {
     /**
      * 扫描指定包下的注解。
      *
+     * @param loader
      * @param pack
      * @param reader
-     * @param loader
      * @param <T>
      * @throws IOException
      * @throws ClassNotFoundException
