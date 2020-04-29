@@ -23,27 +23,43 @@ import java.lang.reflect.Parameter;
  */
 public abstract class Anno {
 
-
-    private static final ResourcePatternResolver    res = new PathMatchingResourcePatternResolver();
-    private static final MetadataReaderFactory      reg = new SimpleMetadataReaderFactory();
     private static final PropertyResolver           env = new StandardEnvironment();
 
     /**
      * 扫描指定包下的注解。
      *
-     * @param packaje
+     * @param pack
      * @param reader
      * @throws IOException
      * @throws ClassNotFoundException
      */
+    public static <T> void scan(String pack, AnnoReader<T> reader) throws IOException, ClassNotFoundException {
+        Anno.scan(Anno.class.getClassLoader(), pack, reader);
+    }
+
+    /**
+     * 扫描指定包下的注解。
+     *
+     * @param pack
+     * @param reader
+     * @param loader
+     * @param <T>
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     @SuppressWarnings("unchecked")
-    public static <T> void scan(String packaje, AnnoReader<T> reader) throws IOException, ClassNotFoundException {
+    public static <T> void scan(ClassLoader loader, String pack, AnnoReader<T> reader) throws IOException {
         String resourcePath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
-                + ClassUtils.convertClassNameToResourcePath(Anno.env.resolveRequiredPlaceholders(packaje))
+                + ClassUtils.convertClassNameToResourcePath(Anno.env.resolveRequiredPlaceholders(pack))
                 + "/**/*.class";
-        for (Resource resource : Anno.res.getResources(resourcePath)) {
-            Class<T> clazz = (Class<T>) Class.forName(Anno.reg.getMetadataReader(resource).getClassMetadata().getClassName());
-            Anno.scan(clazz, reader);
+        ResourcePatternResolver res = new PathMatchingResourcePatternResolver(loader);
+        MetadataReaderFactory reg = new SimpleMetadataReaderFactory(loader);
+
+        for (Resource resource : res.getResources(resourcePath)) {
+            try {
+                Class<T> clazz = (Class<T>) Class.forName(reg.getMetadataReader(resource).getClassMetadata().getClassName(), true, loader);
+                Anno.scan(clazz, reader);
+            } catch (ClassNotFoundException | NoClassDefFoundError | ExceptionInInitializerError e) {}
         }
     }
 
