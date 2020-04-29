@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
-
+/*
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {TestFomjarCoreApplication.class})
 public class TestDist {
@@ -82,3 +82,4 @@ public class TestDist {
     }
 
 }
+*/

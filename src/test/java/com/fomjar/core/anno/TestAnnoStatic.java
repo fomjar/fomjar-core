@@ -11,6 +11,7 @@ import java.lang.reflect.Parameter;
 public class TestAnnoStatic {
 
     @Test
+    @SuppressWarnings("unchecked")
     public void test() throws IOException, ClassNotFoundException {
         Anno.scan("com.fomjar.core", new AnnoAdapter() {
 

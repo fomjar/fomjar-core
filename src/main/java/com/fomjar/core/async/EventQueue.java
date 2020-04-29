@@ -55,6 +55,7 @@ public class EventQueue {
         this.executor   = executor;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> void pub(String event, T data) {
         this.executor.submit(() -> {
             Lock lock = this.lock.readLock();

@@ -32,6 +32,7 @@ public class FomjarCoreAutoConfiguration {
 
     private static final String prefix = "fomjar.core";
 
+    @SuppressWarnings("unchecked")
     private static <T> T ifnull(Object t0, T t1) {
         if (null != t0) return (T) t1.getClass().cast(t0);
         return t1;

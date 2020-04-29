@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class TestAnnoSpring {
 
     @Test
+    @SuppressWarnings("unchecked")
     public void test() {
         Beans.get(RunWith.class, SpringBootTest.class).values().forEach(bean -> {
             System.out.println(bean.getClass().getName());

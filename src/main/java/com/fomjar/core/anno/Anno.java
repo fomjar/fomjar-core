@@ -36,12 +36,13 @@ public abstract class Anno {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public static void scan(String packaje, AnnoReader reader) throws IOException, ClassNotFoundException {
+    @SuppressWarnings("unchecked")
+    public static <T> void scan(String packaje, AnnoReader<T> reader) throws IOException, ClassNotFoundException {
         String resourcePath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
                 + ClassUtils.convertClassNameToResourcePath(Anno.env.resolveRequiredPlaceholders(packaje))
                 + "/**/*.class";
         for (Resource resource : Anno.res.getResources(resourcePath)) {
-            Class clazz = Class.forName(Anno.reg.getMetadataReader(resource).getClassMetadata().getClassName());
+            Class<T> clazz = (Class<T>) Class.forName(Anno.reg.getMetadataReader(resource).getClassMetadata().getClassName());
             Anno.scan(clazz, reader);
         }
     }
@@ -52,7 +53,7 @@ public abstract class Anno {
      * @param clazz
      * @param reader
      */
-    public static void scan(Class clazz, AnnoReader reader) {
+    public static <T> void scan(Class<T> clazz, AnnoReader<T> reader) {
         // Class-level annotations
         reader.read(clazz.getAnnotations(), clazz);
 
@@ -113,7 +114,7 @@ public abstract class Anno {
      * @param annotations
      * @return
      */
-    public static boolean match(Class clazz, Class<? extends Annotation>... annotations) {
+    public static boolean match(Class<?> clazz, Class<? extends Annotation>... annotations) {
         return Anno.match(clazz.getAnnotations(), annotations);
     }
 

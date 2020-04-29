@@ -60,25 +60,4 @@ public class TestPIO {
         assert true;
     }
 
-
-    @Test
-    public void testNode() throws IOException, InterruptedException {
-        new PIO()
-                .readInput(new PIOLineReader() {
-                    @Override
-                    public void readLine(String line) throws Exception {
-                        logger.info("[OUT] {}", line);
-                    }
-                })
-                .readError(new PIOLineReader() {
-                    @Override
-                    public void readLine(String line) throws Exception {
-                        logger.info("[ERR] {}", line);
-                    }
-                })
-                .startup("node -h")
-                .await();
-        assert true;
-    }
-
 }
