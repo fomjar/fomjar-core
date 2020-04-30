@@ -19,7 +19,7 @@ public class TestAnnoStatic {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testSelf() throws IOException, ClassNotFoundException {
+    public void testScanSelf() throws IOException, ClassNotFoundException {
         Anno.scan("com.fomjar.core", new AnnoAdapter() {
 
             @Override
@@ -62,7 +62,7 @@ public class TestAnnoStatic {
     }
 
     @Test
-    public void testController() throws IOException, ClassNotFoundException {
+    public void testScanRequestMapping() throws IOException, ClassNotFoundException {
         Anno.scan(new URLClassLoader(new URL[]{
                         new File("/Users/fomjar/Documents/work/code/df/df-common/target/classes").toURI().toURL(),
                         new File("/Users/fomjar/Documents/work/code/df/df-iot/target/classes").toURI().toURL(),
