@@ -19,17 +19,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class EventQueue {
 
-    /**
-     * 事件监听器。
-     *
-     * @param <T>
-     */
-    public interface EventListener<T> {
-
-        void on(String event, T data);
-
-    }
-
     private static final AtomicLong ID = new AtomicLong(0);
 
     /**
