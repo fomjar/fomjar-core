@@ -46,7 +46,7 @@ public class QueuedExecutor implements ExecutorService {
         new Thread(() -> {
             while (this.run || !this.queue.isEmpty()) {
 
-                try {this.current = this.queue.poll(3, TimeUnit.SECONDS);}
+                try {this.current = this.queue.poll(1, TimeUnit.HOURS);}
                 catch (InterruptedException e) {e.printStackTrace();}
 
                 if (null != this.current) {
