@@ -8,6 +8,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.classreading.SimpleMetadataReaderFactory;
 import org.springframework.util.ClassUtils;
+import sun.misc.Unsafe;
 
 import java.io.IOException;
 import java.lang.reflect.*;
@@ -21,9 +22,9 @@ import java.util.*;
 public abstract class DS {
 
     /**
-     * 调用一个对象的成员方法。
+     * 调用一个对象的成员方法或类的静态方法。
      *
-     * @param object
+     * @param object object or class
      * @param method
      * @param params
      * @return
@@ -35,9 +36,9 @@ public abstract class DS {
     }
 
     /**
-     * 调用一个对象的成员方法。
+     * 调用一个对象的成员方法或类的静态方法。
      *
-     * @param object
+     * @param object object or class
      * @param method
      * @param type
      * @param params
@@ -47,7 +48,9 @@ public abstract class DS {
      * @throws IllegalAccessException
      */
     public static <T> T call(Object object, String method, Class<? extends T> type, Object... params) throws InvocationTargetException, IllegalAccessException {
-        for (Method m : DS.getMethods(object.getClass())) {
+        for (Method m : DS.getMethods(object instanceof Class<?>
+                ? (Class<?>) object
+                : object.getClass())) {
             if (null != method && !method.equals(m.getName()))
                 continue;
             if (null != type && !type.isAssignableFrom(m.getReturnType()))
@@ -60,9 +63,9 @@ public abstract class DS {
     }
 
     /**
-     * 访问一个对象的成员变量。
+     * 访问一个对象的成员变量或类的静态变量。
      *
-     * @param object
+     * @param object object or class
      * @param field
      * @return
      * @throws IllegalAccessException
@@ -72,9 +75,9 @@ public abstract class DS {
     }
 
     /**
-     * 访问一个对象的成员变量。
+     * 访问一个对象的成员变量或类的静态变量。
      *
-     * @param object
+     * @param object object or class
      * @param field
      * @param type
      * @param <T>
@@ -82,7 +85,9 @@ public abstract class DS {
      * @throws IllegalAccessException
      */
     public static <T> T get(Object object, String field, Class<? extends T> type) throws IllegalAccessException {
-        for (Field f : DS.getFields(object.getClass())) {
+        for (Field f : DS.getFields(object instanceof Class<?>
+                ? (Class<?>) object
+                : object.getClass())) {
             if (null != field && !field.equals(f.getName()))
                 continue;
             if (null != type && !type.isAssignableFrom(f.getType()))
@@ -95,15 +100,17 @@ public abstract class DS {
     }
 
     /**
-     * 修改一个对象的成员变量。
+     * 修改一个对象的成员变量或类的静态变量。
      *
-     * @param object
+     * @param object object or class
      * @param field
      * @param value
      * @throws IllegalAccessException
      */
     public static void set(Object object, String field, Object value) throws IllegalAccessException {
-        for (Field f : DS.getFields(object.getClass())) {
+        for (Field f : DS.getFields(object instanceof Class<?>
+                ? (Class<?>) object
+                : object.getClass())) {
             if (!field.equals(f.getName()))
                 continue;
 
@@ -125,6 +132,13 @@ public abstract class DS {
         methods.addAll(Arrays.asList(type.getMethods()));
         methods.addAll(Arrays.asList(type.getDeclaredMethods()));
         return methods.toArray(new Method[methods.size()]);
+    }
+
+
+    public static Unsafe unsafe = null;
+    static {
+        try {DS.unsafe = DS.get(Unsafe.class, "theUnsafe", Unsafe.class);}
+        catch (IllegalAccessException e) {e.printStackTrace();}
     }
 
 
