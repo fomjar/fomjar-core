@@ -13,6 +13,7 @@ public class TestEL {
 
     @Autowired
     private EL el;
+//    private EL el = new FreeMarkerEL();
 
     @Test
     public void testDefaults() {
