@@ -1,6 +1,7 @@
 package com.fomjar.core.anno;
 
 import com.fomjar.core.ds.DS;
+import com.fomjar.core.ds.DSFilter;
 import com.fomjar.core.ds.DSReader;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ public abstract class Anno {
      * @throws IOException
      */
     public static void scan(String pack, AnnoReader reader) throws IOException {
-        Anno.scan(Anno.class.getClassLoader(), pack, null, reader);
+        Anno.scan(Anno.class.getClassLoader(), pack, null, null, reader);
     }
 
     /**
@@ -36,19 +37,19 @@ public abstract class Anno {
      * @throws IOException
      */
     public static void scan(ClassLoader loader, String pack, AnnoReader reader) throws IOException {
-        Anno.scan(loader, pack, null, reader);
+        Anno.scan(loader, pack, null, null, reader);
     }
 
     /**
      * 扫描指定包下的注解。
      *
      * @param pack
-     * @param filter class-level filter
+     * @param annoFilter class-level filter
      * @param reader
      * @throws IOException
      */
-    public static void scan(String pack, AnnoFilter filter, AnnoReader reader) throws IOException {
-        Anno.scan(Anno.class.getClassLoader(), pack, filter, reader);
+    public static void scan(String pack, DSFilter dsFilter, AnnoFilter annoFilter, AnnoReader reader) throws IOException {
+        Anno.scan(Anno.class.getClassLoader(), pack, dsFilter, annoFilter, reader);
     }
 
     /**
@@ -56,36 +57,36 @@ public abstract class Anno {
      *
      * @param loader
      * @param pack
-     * @param filter class-level filter
+     * @param annoFilter class-level filter
      * @param reader
      * @throws IOException
      */
-    public static void scan(ClassLoader loader, String pack, AnnoFilter filter, AnnoReader reader) throws IOException {
-        DS.scan(loader, pack, new DSReader() {
+    public static void scan(ClassLoader loader, String pack, DSFilter dsFilter, AnnoFilter annoFilter, AnnoReader reader) throws IOException {
+        DS.scan(loader, pack, dsFilter, new DSReader() {
             @Override
             public void read(Class<?> type) {
-                if (null != filter && !filter.filter(type.getAnnotations()))
+                if (null != annoFilter && !annoFilter.filter(type.getAnnotations()))
                     return;
 
                 reader.read(type.getAnnotations(), type);
             }
             @Override
             public void read(Class<?> type, Method method) {
-                if (null != filter && !filter.filter(type.getAnnotations()))
+                if (null != annoFilter && !annoFilter.filter(type.getAnnotations()))
                     return;
 
                 reader.read(method.getAnnotations(), type, method);
             }
             @Override
             public void read(Class<?> type, Method method, Parameter parameter) {
-                if (null != filter && !filter.filter(type.getAnnotations()))
+                if (null != annoFilter && !annoFilter.filter(type.getAnnotations()))
                     return;
 
                 reader.read(parameter.getAnnotations(), type, method, parameter);
             }
             @Override
             public void read(Class<?> type, Field field) {
-                if (null != filter && !filter.filter(type.getAnnotations()))
+                if (null != annoFilter && !annoFilter.filter(type.getAnnotations()))
                     return;
 
                 reader.read(field.getAnnotations(), type, field);
