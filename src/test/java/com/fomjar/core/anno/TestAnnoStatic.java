@@ -1,29 +1,31 @@
 package com.fomjar.core.anno;
 
+import com.fomjar.core.ds.DS;
 import org.junit.Test;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
 public class TestAnnoStatic {
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testScanSelf() throws IOException, ClassNotFoundException {
+    public void testScanSelf() throws IOException {
         Anno.scan("com.fomjar.core", new AnnoAdapter() {
 
             @Override
-            public void read(Annotation[] annotations, Class clazz) {
+            public void read(Annotation[] annotations, Class<?> clazz) {
                 if (0 < annotations.length)
                     System.out.println(clazz);
                 for (Annotation annotation : annotations) {
@@ -32,7 +34,7 @@ public class TestAnnoStatic {
             }
 
             @Override
-            public void read(Annotation[] annotations, Class clazz, Method method) {
+            public void read(Annotation[] annotations, Class<?> clazz, Method method) {
                 if (0 < annotations.length)
                     System.out.println(method);
                 for (Annotation annotation : annotations) {
@@ -41,7 +43,7 @@ public class TestAnnoStatic {
             }
 
             @Override
-            public void read(Annotation[] annotations, Class clazz, Method method, Parameter parameter) {
+            public void read(Annotation[] annotations, Class<?> clazz, Method method, Parameter parameter) {
                 if (0 < annotations.length)
                     System.out.println(parameter);
                 for (Annotation annotation : annotations) {
@@ -50,7 +52,7 @@ public class TestAnnoStatic {
             }
 
             @Override
-            public void read(Annotation[] annotations, Class clazz, Field field) {
+            public void read(Annotation[] annotations, Class<?> clazz, Field field) {
                 if (0 < annotations.length)
                     System.out.println(field);
                 for (Annotation annotation : annotations) {
@@ -62,7 +64,7 @@ public class TestAnnoStatic {
     }
 
     @Test
-    public void testScanRequestMapping() throws IOException, ClassNotFoundException {
+    public void testScanController() throws IOException {
         Anno.scan(new URLClassLoader(new URL[]{
                         new File("/Users/fomjar/Documents/work/code/df/df-common/target/classes").toURI().toURL(),
                         new File("/Users/fomjar/Documents/work/code/df/df-iot/target/classes").toURI().toURL(),
@@ -74,42 +76,25 @@ public class TestAnnoStatic {
                         new File("/Users/fomjar/Documents/work/code/df/df-video/target/classes").toURI().toURL(),
                 }),
                 "com.oceangreate.df",
+                AnnoFilter.any(Controller.class, RestController.class),
                 new AnnoAdapter() {
                     @Override
-                    public void read(Annotation[] annotations, Class clazz, Method method) {
-                        if (!Anno.match(method, RequestMapping.class)
-                                && !Anno.match(method, PostMapping.class)
-                                && !Anno.match(method, GetMapping.class))
-                            return;
+                    public void read(Annotation[] annotations, Class<?> type, Method method) {
+                        Annotation anno0 = Anno.any(type.getAnnotations(), RequestMapping.class, GetMapping.class, PostMapping.class);
+                        Annotation anno1 = Anno.any(method.getAnnotations(), RequestMapping.class, GetMapping.class, PostMapping.class);
+                        if (null == anno1) return;
 
-                        String[] path0 = null;
-                        String[] path1 = null;
-                        for (Annotation anno : clazz.getAnnotations()) {
-                            if (RequestMapping.class.isAssignableFrom(anno.annotationType())) {
-                                path0 = ((RequestMapping) anno).value();
-                            }
-                            if (GetMapping.class.isAssignableFrom(anno.annotationType())) {
-                                path0 = ((GetMapping) anno).value();
-                            }
-                            if (PostMapping.class.isAssignableFrom(anno.annotationType())) {
-                                path0 = ((PostMapping) anno).value();
-                            }
+                        String[] path0 = new String[0];
+                        String[] path1 = new String[0];
+                        try {
+                            path0 = null == anno0 ? new String[] {} : DS.call(anno0, "value", String[].class);
+                            path1 = DS.call(anno1, "value", String[].class);
+                        } catch (InvocationTargetException | IllegalAccessException e) {
+                            e.printStackTrace();
                         }
-                        for (Annotation anno : method.getAnnotations()) {
-                            if (RequestMapping.class.isAssignableFrom(anno.annotationType())) {
-                                path1 = ((RequestMapping) anno).value();
-                            }
-                            if (GetMapping.class.isAssignableFrom(anno.annotationType())) {
-                                path1 = ((GetMapping) anno).value();
-                            }
-                            if (PostMapping.class.isAssignableFrom(anno.annotationType())) {
-                                path1 = ((PostMapping) anno).value();
-                            }
-                        }
-                        if (null == path1 || 0 == path1.length)
-                            return;
 
-                        path0 = null == path0 ? new String[] {} : path0;
+                        if (0 == path1.length) return;
+
                         for (String p0 : path0) {
                             for (String p1 : path1) {
                                 String path = "/" + p0 + "/" + p1;

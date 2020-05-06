@@ -7,9 +7,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -27,30 +25,30 @@ public class Beans implements ApplicationContextAware {
         Beans.applicationContext = applicationContext;
     }
 
-    public static <T> T get(Class<T> clazz) {
-        return Beans.applicationContext.getBean(clazz);
+    public static <T> T get(Class<T> type) {
+        return Beans.applicationContext.getBean(type);
     }
 
     public static Object get(String name) {
         return Beans.applicationContext.getBean(name);
     }
 
-    public static <T> T get(String name, Class<T> clazz) {
-        return Beans.applicationContext.getBean(name, clazz);
+    public static <T> T get(String name, Class<T> type) {
+        return Beans.applicationContext.getBean(name, type);
     }
 
-    public static Map<String, Object> get(Class<? extends Annotation>... annotations) {
-        if (null == annotations || 0 == annotations.length) return null;
+    public static Map<String, Object> get(Class<? extends Annotation>... types) {
+        if (null == types || 0 == types.length) return null;
 
-        return Beans.applicationContext.getBeansWithAnnotation(annotations[0])
+        return Beans.applicationContext.getBeansWithAnnotation(types[0])
                 .entrySet()
                 .stream()
-                .filter(e -> Anno.match(e.getValue().getClass(), annotations))
+                .filter(e -> null != Anno.any(e.getValue().getClass().getAnnotations(), types))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public static <T> Map<String, T> getAll(Class<T> clazz) {
-        return Beans.applicationContext.getBeansOfType(clazz);
+    public static <T> Map<String, T> getAll(Class<T> type) {
+        return Beans.applicationContext.getBeansOfType(type);
     }
 
 }

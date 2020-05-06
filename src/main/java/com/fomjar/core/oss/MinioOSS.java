@@ -1,6 +1,6 @@
 package com.fomjar.core.oss;
 
-import com.fomjar.core.coll.Maps;
+import com.fomjar.core.ds.DS;
 import io.minio.MinioClient;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class MinioOSS extends OSS {
                     name,
                     is,
                     null,
-                    Maps.wrap(new HashMap<String, String>())
+                    DS.wrap(new HashMap<String, String>())
                             .put("Content-Disposition", String.format("attachment; filename*=utf-8''%s", URLEncoder.encode(name, "utf-8")))
                             .get(),
                     null,

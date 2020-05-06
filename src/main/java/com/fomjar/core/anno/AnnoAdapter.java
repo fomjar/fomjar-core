@@ -10,25 +10,25 @@ import java.lang.reflect.Parameter;
  *
  * @author fomjar
  */
-public abstract class AnnoAdapter<T> implements AnnoReader<T> {
+public abstract class AnnoAdapter implements AnnoReader {
 
     @Override
-    public void read(Annotation[] annotations, Class<T> clazz) {
+    public void read(Annotation[] annotations, Class<?> clazz) {
 
     }
 
     @Override
-    public void read(Annotation[] annotations, Class<T> clazz, Method method) {
+    public void read(Annotation[] annotations, Class<?> clazz, Method method) {
 
     }
 
     @Override
-    public void read(Annotation[] annotations, Class<T> clazz, Method method, Parameter parameter) {
+    public void read(Annotation[] annotations, Class<?> clazz, Method method, Parameter parameter) {
 
     }
 
     @Override
-    public void read(Annotation[] annotations, Class<T> clazz, Field field) {
+    public void read(Annotation[] annotations, Class<?> clazz, Field field) {
 
     }
 
