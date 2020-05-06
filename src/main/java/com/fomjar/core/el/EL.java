@@ -16,7 +16,7 @@ public interface EL {
      * @param clazz
      * @return
      */
-    default EL register(Class clazz) {
+    default EL register(Class<?> clazz) {
         return this.register(clazz.getSimpleName(), clazz);
     }
 
@@ -27,7 +27,7 @@ public interface EL {
      * @param clazz
      * @return
      */
-    EL register(String name, Class clazz);
+    EL register(String name, Class<?> clazz);
 
     /**
      * 在上下文中注册静态方法。

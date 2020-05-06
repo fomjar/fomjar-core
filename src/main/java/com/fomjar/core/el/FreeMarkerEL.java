@@ -36,7 +36,7 @@ public class FreeMarkerEL extends AbstractEL {
     }
 
     @Override
-    public EL register(String name, Class clazz) {
+    public EL register(String name, Class<?> clazz) {
         try {return this.register(name, this.beansWrapper.getStaticModels().get(clazz.getName()));}
         catch (TemplateModelException e) {e.printStackTrace();}
         return this;

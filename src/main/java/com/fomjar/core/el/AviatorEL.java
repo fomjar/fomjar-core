@@ -25,7 +25,7 @@ public class AviatorEL extends AbstractEL {
 
 
     @Override
-    public EL register(String name, Class clazz) {
+    public EL register(String name, Class<?> clazz) {
         for (Method method : clazz.getMethods()) {
             if (!Modifier.isStatic(method.getModifiers()))
                 continue;
@@ -61,7 +61,7 @@ public class AviatorEL extends AbstractEL {
     @Override
     public String eval(String exp) {
         Object result = this.aviator.execute(exp, this.context());
-        return null != result ? result.toString() : null;
+        return null != result ? result.toString() : "";
     }
 
     private AviatorFunction encodeFunction(String name, Method method) {
