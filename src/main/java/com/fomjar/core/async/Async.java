@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
  * </code>
  * 的方式来调用。
  */
-public class Async {
+public abstract class Async {
 
     public static final ExecutorService queue   = QueuedExecutor.main;
     public static       ExecutorService pool    = null;

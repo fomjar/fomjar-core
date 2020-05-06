@@ -18,7 +18,7 @@ import java.util.*;
  *
  * @author fomjar
  */
-public class DS {
+public abstract class DS {
 
     /**
      * 调用一个对象的成员方法。
