@@ -40,7 +40,7 @@ public class EventQueue {
 
     public EventQueue(ExecutorService executor) {
         this.listeners  = new HashMap<>();
-        this.lock       = new ReentrantReadWriteLock();
+        this.lock       = new ReentrantReadWriteLock(true);
         this.executor   = executor;
     }
 
@@ -51,7 +51,10 @@ public class EventQueue {
             try {
                 lock.lock();
                 if (!this.listeners.containsKey(event)) return;
-                this.listeners.get(event).forEach(listener -> ((EventListener<T>) listener).on(event, data));
+                this.listeners.get(event).forEach(listener -> {
+                    try {((EventListener<T>) listener).on(event, data);}
+                    catch (Exception e) {e.printStackTrace();}
+                });
             } finally {
                 lock.unlock();
             }

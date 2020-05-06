@@ -134,7 +134,6 @@ public abstract class DS {
         return methods.toArray(new Method[methods.size()]);
     }
 
-
     public static Unsafe unsafe = null;
     static {
         try {DS.unsafe = DS.get(Unsafe.class, "theUnsafe", Unsafe.class);}
