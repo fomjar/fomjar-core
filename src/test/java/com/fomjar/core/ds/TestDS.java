@@ -18,9 +18,12 @@ public class TestDS {
     }
 
     @Test
-    public void testAccessible() throws InvocationTargetException, IllegalAccessException {
-        assert DS.call("123456", "length", int.class) == 6;
-        assert DS.get(new LinkedList<>(), "size", int.class) == 0;
+    public void testAccessible() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
+        System.out.println(DS.call("123456", Integer.class, "length"));
+        System.out.println(DS.call("123456", String.class, "substring", 1));
+        System.out.println(DS.call("123456", String.class, "substring", 1, 4));
+        DS.set(new LinkedList<>(), "size", 3);
+        System.out.println(DS.get(new LinkedList<>(), Integer.class, "size"));
     }
 
     @Test

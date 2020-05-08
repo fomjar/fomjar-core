@@ -13,6 +13,7 @@ import sun.misc.Unsafe;
 import java.io.IOException;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.IntFunction;
 
 /**
  * 数据结构访问和处理工具集。
@@ -22,44 +23,70 @@ import java.util.*;
 public abstract class DS {
 
     /**
-     * 调用一个对象的成员方法或类的静态方法。
+     * 获取类内部定义的指定成员字段。范围包括各类访问权限及各级父类定义的。
      *
-     * @param object object or class
-     * @param method
-     * @param params
+     * @param clazz
+     * @param field
      * @return
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
+     * @throws NoSuchFieldException
      */
-    public static Object call(Object object, String method, Object... params) throws InvocationTargetException, IllegalAccessException {
-        return DS.call(object, method, null, params);
+    public static Field field(Class<?> clazz, String field) throws NoSuchFieldException {
+        try { return clazz.getField(field); }
+        catch (NoSuchFieldException e) { return clazz.getDeclaredField(field); }
     }
 
     /**
-     * 调用一个对象的成员方法或类的静态方法。
+     * 获取类内部定义的指定成员方法。范围包括各类访问权限及各级父类定义的。
      *
-     * @param object object or class
+     * @param clazz
      * @param method
-     * @param type
      * @param params
-     * @param <T>
      * @return
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
      */
-    public static <T> T call(Object object, String method, Class<? extends T> type, Object... params) throws InvocationTargetException, IllegalAccessException {
-        for (Method m : DS.getMethods(object instanceof Class<?>
-                ? (Class<?>) object
-                : object.getClass())) {
-            if (null != method && !method.equals(m.getName()))
-                continue;
-            if (null != type && !type.isAssignableFrom(m.getReturnType()))
-                continue;
-
-            m.setAccessible(true);
-            return (T) m.invoke(object, params);
+    public static Method method(Class<?> clazz, String method, Class<?>... params) throws NoSuchMethodException {
+        try { return clazz.getMethod(method, params); }
+        catch (NoSuchMethodException e) {
+            try { return clazz.getDeclaredMethod(method, params); }
+            catch (NoSuchMethodException noSuchMethodException) {
+                // 根据方法名和参数数量进行粗略判断
+                // 原因：在参数自动装箱的情况下，无法根据参数类型准确提取方法
+                // 误判：方法重载、存在自动装箱（含原始数据类型参数）、且参数数量相同的情况下，可能存在误判
+                for (Method m : DS.methods(clazz)) {
+                    if (m.getName().equals(method)
+                            && ((null == params && 0 == m.getParameterCount())
+                                    || params.length == m.getParameterCount()))
+                        return m;
+                }
+                throw new NoSuchMethodException(String.format("%s(%s)", method, Arrays.toString(params)));
+            }
         }
-        return null;
+    }
+
+    /**
+     * 获取类内部定义的所有成员字段。范围包括各类访问权限及各级父类定义的。
+     *
+     * @param clazz
+     * @return
+     */
+    public static Field[] fields(Class<?> clazz) {
+        Set<Field> fields = new HashSet<>();
+        fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+        fields.addAll(Arrays.asList(clazz.getFields()));
+        return fields.toArray(new Field[0]);
+    }
+
+    /**
+     * 获取类内部定义的所有成员方法。范围包括各类访问权限及各级父类定义的。
+     *
+     * @param clazz
+     * @return
+     */
+    public static Method[] methods(Class<?> clazz) {
+        Set<Method> methods = new HashSet<>();
+        methods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
+        methods.addAll(Arrays.asList(clazz.getMethods()));
+        return methods.toArray(new Method[0]);
     }
 
     /**
@@ -69,34 +96,28 @@ public abstract class DS {
      * @param field
      * @return
      * @throws IllegalAccessException
+     * @throws NoSuchFieldException
      */
-    public static Object get(Object object, String field) throws IllegalAccessException {
-        return DS.get(object, field, Object.class);
+    public static Object get(Object object, String field) throws NoSuchFieldException, IllegalAccessException {
+        return DS.get(object, Object.class, field);
     }
 
     /**
      * 访问一个对象的成员变量或类的静态变量。
      *
      * @param object object or class
+     * @param result
      * @param field
-     * @param type
      * @param <T>
      * @return
+     * @throws NoSuchFieldException
      * @throws IllegalAccessException
      */
-    public static <T> T get(Object object, String field, Class<? extends T> type) throws IllegalAccessException {
-        for (Field f : DS.getFields(object instanceof Class<?>
-                ? (Class<?>) object
-                : object.getClass())) {
-            if (null != field && !field.equals(f.getName()))
-                continue;
-            if (null != type && !type.isAssignableFrom(f.getType()))
-                continue;
+    public static <T> T get(Object object, Class<? extends T> result, String field) throws NoSuchFieldException, IllegalAccessException {
+        Field f = DS.field(object instanceof Class<?> ? (Class<?>) object : object.getClass(), field);
 
-            f.setAccessible(true);
-            return (T) f.get(object);
-        }
-        return null;
+        f.setAccessible(true);
+        return result.cast(f.get(object));
     }
 
     /**
@@ -105,39 +126,57 @@ public abstract class DS {
      * @param object object or class
      * @param field
      * @param value
+     * @throws NoSuchFieldException
      * @throws IllegalAccessException
      */
-    public static void set(Object object, String field, Object value) throws IllegalAccessException {
-        for (Field f : DS.getFields(object instanceof Class<?>
-                ? (Class<?>) object
-                : object.getClass())) {
-            if (!field.equals(f.getName()))
-                continue;
+    public static void set(Object object, String field, Object value) throws NoSuchFieldException, IllegalAccessException {
+        Field f = DS.field(object instanceof Class<?> ? (Class<?>) object : object.getClass(), field);
 
-            f.setAccessible(true);
-            f.set(object, value);
-            break;
-        }
+        f.setAccessible(true);
+        f.set(object, value);
     }
 
-    private static Field[] getFields(Class<?> type) {
-        Set<Field> fields = new HashSet<>();
-        fields.addAll(Arrays.asList(type.getFields()));
-        fields.addAll(Arrays.asList(type.getDeclaredFields()));
-        return fields.toArray(new Field[fields.size()]);
+    /**
+     * 调用一个对象的成员方法或类的静态方法。
+     *
+     * @param object object or class
+     * @param method
+     * @param params
+     * @return
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public static Object call(Object object, String method, Object... params) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return DS.call(object, Object.class, method, params);
     }
 
-    private static Method[] getMethods(Class<?> type) {
-        Set<Method> methods = new HashSet<>();
-        methods.addAll(Arrays.asList(type.getMethods()));
-        methods.addAll(Arrays.asList(type.getDeclaredMethods()));
-        return methods.toArray(new Method[methods.size()]);
+    /**
+     * 调用一个对象的成员方法或类的静态方法。
+     *
+     * @param object object or class
+     * @param result
+     * @param method
+     * @param params
+     * @param <T>
+     * @return
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public static <T> T call(Object object, Class<? extends T> result, String method, Object... params) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method m = DS.method(object instanceof Class<?> ? (Class<?>) object : object.getClass(),
+                method,
+                null == params ? null : Arrays.stream(params).map(Object::getClass).toArray((IntFunction<Class<?>[]>) Class[]::new));
+
+        m.setAccessible(true);
+        return result.cast(m.invoke(object, params));
     }
 
     public static Unsafe unsafe = null;
     static {
-        try {DS.unsafe = DS.get(Unsafe.class, "theUnsafe", Unsafe.class);}
-        catch (IllegalAccessException e) {e.printStackTrace();}
+        try {DS.unsafe = DS.get(Unsafe.class, Unsafe.class, "theUnsafe");}
+        catch (NoSuchFieldException | IllegalAccessException e) {e.printStackTrace();}
     }
 
 
@@ -209,39 +248,18 @@ public abstract class DS {
         // Class-level
         reader.read(type);
 
-        // Public methods within this class and super classes
-        for (Method method : type.getMethods()) {
+        // Fields within this class and super classes
+        for (Field field : DS.fields(type))
+            reader.read(type, field);
+
+        // Methods within this class and super classes
+        for (Method method : DS.methods(type)) {
             reader.read(type, method);
 
             // Method parameters
             for (Parameter parameter : method.getParameters()) {
                 reader.read(type, method, parameter);
             }
-        }
-
-        // Non-public methods within this class
-        for (Method method : type.getDeclaredMethods()) {
-            if (Modifier.isPublic(method.getModifiers()))
-                continue;
-
-            reader.read(type, method);
-
-            // Method parameters
-            for (Parameter parameter : method.getParameters()) {
-                reader.read(type, method, parameter);
-            }
-        }
-
-        // Public fields within this class and super classes
-        for (Field field : type.getFields())
-            reader.read(type, field);
-
-        // Non-public fields within this class
-        for (Field field : type.getDeclaredFields()) {
-            if (Modifier.isPublic(field.getModifiers()))
-                continue;
-
-            reader.read(type, field);
         }
     }
 

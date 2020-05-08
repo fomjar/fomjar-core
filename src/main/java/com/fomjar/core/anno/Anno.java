@@ -44,6 +44,7 @@ public abstract class Anno {
      * 扫描指定包下的注解。
      *
      * @param pack
+     * @param dsFilter
      * @param annoFilter class-level filter
      * @param reader
      * @throws IOException
@@ -57,6 +58,7 @@ public abstract class Anno {
      *
      * @param loader
      * @param pack
+     * @param dsFilter
      * @param annoFilter class-level filter
      * @param reader
      * @throws IOException

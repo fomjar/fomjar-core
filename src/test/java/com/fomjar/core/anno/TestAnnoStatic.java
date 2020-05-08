@@ -63,6 +63,7 @@ public class TestAnnoStatic {
         });
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testScanController() throws IOException {
         Anno.scan(new URLClassLoader(new URL[]{
@@ -88,9 +89,9 @@ public class TestAnnoStatic {
                         String[] path0 = new String[0];
                         String[] path1 = new String[0];
                         try {
-                            path0 = null == anno0 ? new String[] {} : DS.call(anno0, "value", String[].class);
-                            path1 = DS.call(anno1, "value", String[].class);
-                        } catch (InvocationTargetException | IllegalAccessException e) {
+                            path0 = null == anno0 ? new String[] {} : DS.call(anno0, String[].class, "value");
+                            path1 = DS.call(anno1, String[].class, "value");
+                        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                             e.printStackTrace();
                         }
 
