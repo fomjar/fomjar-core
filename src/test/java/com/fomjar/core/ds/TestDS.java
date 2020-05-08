@@ -18,19 +18,35 @@ public class TestDS {
     }
 
     @Test
-    public void testAccessible() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
-        System.out.println(DS.call("123456", Integer.class, "length"));
-        System.out.println(DS.call("123456", String.class, "substring", 1));
-        System.out.println(DS.call("123456", String.class, "substring", 1, 4));
-        DS.set(new LinkedList<>(), "size", 3);
-        System.out.println(DS.get(new LinkedList<>(), Integer.class, "size"));
+    public void testAccess() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
+        System.out.println(DS.call("123456", "length"));
+        System.out.println(DS.call("123456", "substring", 1));
+        System.out.println(DS.call("123456", "substring", 1, 4));
+        System.out.println(DS.get(new LinkedList<>(), "size"));
     }
 
     @Test
-    public void testUnsafe() {
-        long p = DS.unsafe.allocateMemory(8);
-        System.out.println(DS.unsafe.getInt(p));
-        DS.unsafe.freeMemory(p);
+    public void testUnsafe() throws NoSuchFieldException, IllegalAccessException {
+//        DS.setFinalBoolean(Boolean.class, "TRUE", false);
+        DS.setFinalByte(Byte.class,         "MAX_VALUE", (byte) 1);
+        DS.setFinalChar(Character.class,    "MAX_VALUE", '1');
+        DS.setFinalShort(Short.class,       "MAX_VALUE", (short) 1);
+        DS.setFinalInt(Integer.class,       "MAX_VALUE", 1);
+        DS.setFinalLong(Long.class,         "MAX_VALUE", 1L);
+        DS.setFinalFloat(Float.class,       "MAX_VALUE", 1.1F);
+        DS.setFinalDouble(Double.class,     "MAX_VALUE", 1.1D);
+//        System.out.println(DS.get(Boolean.class, "TRUE"));
+        System.out.println(DS.get(Byte.class,       "MAX_VALUE"));
+        System.out.println(DS.get(Character.class,  "MAX_VALUE"));
+        System.out.println(DS.get(Short.class,      "MAX_VALUE"));
+        System.out.println(DS.get(Integer.class,    "MAX_VALUE"));
+        System.out.println(DS.get(Long.class,       "MAX_VALUE"));
+        System.out.println(DS.get(Float.class,      "MAX_VALUE"));
+        System.out.println(DS.get(Double.class,     "MAX_VALUE"));
+
+        String s = "12345";
+        DS.setFinalObject(s, "value", new char[] {'a', 'b', 'c', 'd', 'e'});
+        System.out.println(s);
     }
 
 }

@@ -173,10 +173,157 @@ public abstract class DS {
         return result.cast(m.invoke(object, params));
     }
 
+    /**
+     * Unsafe instance offered.
+     */
     public static Unsafe unsafe = null;
     static {
         try {DS.unsafe = DS.get(Unsafe.class, Unsafe.class, "theUnsafe");}
         catch (NoSuchFieldException | IllegalAccessException e) {e.printStackTrace();}
+    }
+
+    /**
+     * 强制修改对象的成员常量或类的静态常量。
+     *
+     * @param object instance or class
+     * @param field
+     * @param value
+     * @throws NoSuchFieldException
+     */
+    public static void setFinalBoolean(Object object, String field, boolean value) throws NoSuchFieldException {
+        DS.unsafe.putBoolean(object,
+                object instanceof Class<?>
+                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
+                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                value);
+    }
+
+    /**
+     * 强制修改对象的成员常量或类的静态常量。
+     *
+     * @param object instance or class
+     * @param field
+     * @param value
+     * @throws NoSuchFieldException
+     */
+    public static void setFinalByte(Object object, String field, byte value) throws NoSuchFieldException {
+        DS.unsafe.putByte(object,
+                object instanceof Class<?>
+                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
+                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                value);
+    }
+
+    /**
+     * 强制修改对象的成员常量或类的静态常量。
+     *
+     * @param object instance or class
+     * @param field
+     * @param value
+     * @throws NoSuchFieldException
+     */
+    public static void setFinalChar(Object object, String field, char value) throws NoSuchFieldException {
+        DS.unsafe.putChar(object,
+                object instanceof Class<?>
+                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
+                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                value);
+    }
+
+    /**
+     * 强制修改对象的成员常量或类的静态常量。
+     *
+     * @param object instance or class
+     * @param field
+     * @param value
+     * @throws NoSuchFieldException
+     */
+    public static void setFinalShort(Object object, String field, short value) throws NoSuchFieldException {
+        DS.unsafe.putShort(object,
+                object instanceof Class<?>
+                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
+                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                value);
+    }
+
+    /**
+     * 强制修改对象的成员常量或类的静态常量。
+     *
+     * @param object instance or class
+     * @param field
+     * @param value
+     * @throws NoSuchFieldException
+     */
+    public static void setFinalInt(Object object, String field, int value) throws NoSuchFieldException {
+        DS.unsafe.putInt(object,
+                object instanceof Class<?>
+                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
+                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                value);
+    }
+
+    /**
+     * 强制修改对象的成员常量或类的静态常量。
+     *
+     * @param object instance or class
+     * @param field
+     * @param value
+     * @throws NoSuchFieldException
+     */
+    public static void setFinalLong(Object object, String field, long value) throws NoSuchFieldException {
+        DS.unsafe.putLong(object,
+                object instanceof Class<?>
+                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
+                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                value);
+    }
+
+    /**
+     * 强制修改对象的成员常量或类的静态常量。
+     *
+     * @param object instance or class
+     * @param field
+     * @param value
+     * @throws NoSuchFieldException
+     */
+    public static void setFinalFloat(Object object, String field, float value) throws NoSuchFieldException {
+        DS.unsafe.putFloat(object,
+                object instanceof Class<?>
+                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
+                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                value);
+    }
+
+    /**
+     * 强制修改对象的成员常量或类的静态常量。
+     *
+     * @param object instance or class
+     * @param field
+     * @param value
+     * @throws NoSuchFieldException
+     */
+    public static void setFinalDouble(Object object, String field, double value) throws NoSuchFieldException {
+        DS.unsafe.putDouble(object,
+                object instanceof Class<?>
+                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
+                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                value);
+    }
+
+    /**
+     * 强制修改对象的成员常量或类的静态常量。
+     *
+     * @param object instance or class
+     * @param field
+     * @param value
+     * @throws NoSuchFieldException
+     */
+    public static void setFinalObject(Object object, String field, Object value) throws NoSuchFieldException {
+        DS.unsafe.putObject(object,
+                object instanceof Class<?>
+                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
+                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                value);
     }
 
 
