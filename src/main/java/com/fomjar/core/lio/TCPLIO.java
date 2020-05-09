@@ -1,5 +1,7 @@
 package com.fomjar.core.lio;
 
+import com.fomjar.core.async.Async;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,45 +16,26 @@ public class TCPLIO extends LIO {
     private byte[]          buf;
 
     public TCPLIO(Socket socket) throws IOException {
-        this(socket, null);
-    }
-
-    public TCPLIO(Socket socket, LIOReader reader) throws IOException {
-        this.read(reader);
-        this.handler(socket);
-    }
-
-    @Override
-    public TCPLIO handler(Object handler) throws IOException {
-        try {this.close();}
-        catch (IOException e) {e.printStackTrace();}
-
-        this.so = (Socket) handler;
-        this.setup();
-        return this;
-    }
-
-    private void setup() throws IOException {
+        this.so = socket;
         this.so.setKeepAlive(true);
         this.is = this.so.getInputStream();
         this.os = this.so.getOutputStream();
         this.buf = new byte[1024 * 4];
-        Pool.submit(() -> {
-            while (this.isOpen()) {
-                try {
+        Async.pool(() -> {
+            try {
+                while (this.isOpen()) {
                     int len = this.is.read(this.buf);
                     if (-1 == len)  break;
                     if (0 < len)    this.doRead(this.buf, 0, len);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    break;
                 }
+            } catch (IOException e) {
+                // Remote closed.
+                if (null != this.server)
+                    this.server.doDisconnect(this);
+            } finally {
+                try {this.close();}
+                catch (IOException e) {e.printStackTrace();}
             }
-            try {this.close();}
-            catch (IOException e) {e.printStackTrace();}
-
-            if (null != this.server)
-                this.server.doDisconnect(this);
         });
     }
 

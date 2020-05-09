@@ -26,6 +26,7 @@ public interface AnnoFilter {
         };
     }
 
+    @SafeVarargs
     static AnnoFilter any(Class<? extends Annotation>... types) {
         return annotations -> {
             for (Class<? extends Annotation> type : types) {

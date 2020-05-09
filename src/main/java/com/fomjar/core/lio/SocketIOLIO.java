@@ -14,17 +14,7 @@ public class SocketIOLIO extends LIO {
     private SocketIOClient client;
 
     public SocketIOLIO(SocketIOClient client) throws IOException {
-        this(client, null);
-    }
-
-    public SocketIOLIO(SocketIOClient client, LIOReader reader) throws IOException {
-        this.read(reader);
-        this.handler(client);
-    }
-
-    @Override
-    public LIO handler(Object handler) throws IOException {
-        this.client = (SocketIOClient) handler;
+        this.client = client;
 
         Map<String, Object> args = new HashMap<>();
         this.client.getHandshakeData().getUrlParams().entrySet().forEach(e -> {
@@ -43,8 +33,6 @@ public class SocketIOLIO extends LIO {
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
-
-        return this;
     }
 
     @Override
@@ -65,6 +53,7 @@ public class SocketIOLIO extends LIO {
 
     @Override
     public void close() throws IOException {
+        // Do not close socket-io client.
     }
 
     @Override

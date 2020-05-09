@@ -16,21 +16,7 @@ public class WebSocketLIO extends LIO {
     private WebSocketClient client;
     private Session         session;
 
-    public WebSocketLIO(Session session) throws IOException {
-        this(session, null);
-    }
-
-    public WebSocketLIO(Session session, LIOReader reader) throws IOException {
-        this.read(reader);
-        this.handler(session);
-    }
-
     public WebSocketLIO(URI uri) throws IOException {
-        this(uri, null);
-    }
-
-    public WebSocketLIO(URI uri, LIOReader reader) throws IOException {
-        this.read(reader);
         try {
             this.client = new WebSocketClient();
             this.client.start();
@@ -40,9 +26,12 @@ public class WebSocketLIO extends LIO {
         }
     }
 
-    @Override
-    public LIO handler(Object handler) throws IOException {
-        this.session = (Session) handler;
+    WebSocketLIO(Session session) {
+        this.setup(session);
+    }
+
+    private void setup(Session session) {
+        this.session = session;
 
         Map<String, Object> args = new HashMap<>();
         this.session.getUpgradeRequest().getParameterMap().entrySet().forEach(e -> {
@@ -56,7 +45,6 @@ public class WebSocketLIO extends LIO {
         });
         this.attach("path", this.session.getUpgradeRequest().getRequestURI().getPath());
         this.attach("args", args);
-        return this;
     }
 
     @Override
@@ -107,16 +95,17 @@ public class WebSocketLIO extends LIO {
     public class WebSocketHandler {
 
         @OnWebSocketConnect
-        public void onWebSocketConnect(Session session) throws IOException {
-            WebSocketLIO.this.handler(session);
+        public void onWebSocketConnect(Session session) {
+            WebSocketLIO.this.setup(session);
         }
 
         @OnWebSocketClose
-        public void onWebSocketClose(Session session, int code, String reason) {
+        public void onWebSocketClose(Session session, int code, String reason) throws IOException {
+            WebSocketLIO.this.close();
         }
 
         @OnWebSocketMessage
-        public void onWebSocketMessage(Session session, byte[] buf, int off, int len) throws IOException {
+        public void onWebSocketMessage(Session session, byte[] buf, int off, int len) {
             WebSocketLIO.this.doRead(buf, off, len);
         }
 

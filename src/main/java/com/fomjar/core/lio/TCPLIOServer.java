@@ -1,5 +1,7 @@
 package com.fomjar.core.lio;
 
+import com.fomjar.core.async.Async;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,13 +12,10 @@ public class TCPLIOServer extends LIOServer {
 
     @Override
     public LIOServer startup(int port) throws IOException {
-        this.server = new ServerSocket(port);
-        this.doStartup();
-        return this;
-    }
+        this.shutdown();
 
-    private void doStartup() {
-        Pool.submit(() -> {
+        this.server = new ServerSocket(port);
+        Async.pool(() -> {
             while (!this.server.isClosed()) {
                 try {
                     Socket socket = this.server.accept();
@@ -24,10 +23,12 @@ public class TCPLIOServer extends LIOServer {
                     lio.server = this;
                     this.doConnect(lio);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    // Ignore. Server closed.
                 }
             }
+            this.shutdown();
         });
+        return this;
     }
 
     @Override

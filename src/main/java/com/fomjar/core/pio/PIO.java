@@ -1,10 +1,15 @@
 package com.fomjar.core.pio;
 
-import java.io.*;
+import com.fomjar.core.async.Async;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -14,20 +19,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class PIO {
 
-    private static final ExecutorService pool = Executors.newCachedThreadPool();
-
     private List<PIOReader> inputReaders;
     private List<PIOReader> errorReaders;
 
-    private Process         process;
-    private String[]        cmds;
-    private Integer         pid;
-    private PrintWriter     printer;
+    private Process     process;
+    private String[] cmd;
+    private Integer     pid;
+    private PrintWriter printer;
 
     private Map<String, Object> attach;
 
     public PIO() {
-        super();
         this.inputReaders   = new LinkedList<>();
         this.errorReaders   = new LinkedList<>();
     }
@@ -35,23 +37,23 @@ public class PIO {
     /**
      * 根据给定命令启动此PIO。相关进程启动，相关IO线程挂载。
      *
-     * @param cmds
+     * @param cmd
      * @return
      * @throws IOException
      */
-    public PIO startup(String... cmds) throws IOException {
+    public PIO startup(String... cmd) throws IOException {
         this.shutdown();
 
-        this.process    = cmds.length == 1
-                ? Runtime.getRuntime().exec(cmds[0])
-                : Runtime.getRuntime().exec(cmds);
+        this.process    = cmd.length == 1
+                ? Runtime.getRuntime().exec(cmd[0])
+                : Runtime.getRuntime().exec(cmd);
         this.printer    = new PrintWriter(this.process.getOutputStream(), true);
-        this.cmds       = cmds;
+        this.cmd = cmd;
 
-        PIO.pool.submit(new Worker(this.process,
+        Async.pool(new Worker(this.process,
                 this.process.getInputStream(),
                 this.inputReaders));
-        PIO.pool.submit(new Worker(this.process,
+        Async.pool(new Worker(this.process,
                 this.process.getErrorStream(),
                 this.errorReaders));
 
@@ -67,7 +69,7 @@ public class PIO {
         if (null != this.process) {
             this.process.destroyForcibly();
             this.process    = null;
-            this.cmds       = null;
+            this.cmd = null;
             this.pid        = null;
             this.printer    = null;
         }
@@ -139,7 +141,7 @@ public class PIO {
      *
      * @return
      */
-    public String[] cmds() {return this.cmds;}
+    public String[] cmds() {return this.cmd;}
 
     /**
      * 获取进程ID。

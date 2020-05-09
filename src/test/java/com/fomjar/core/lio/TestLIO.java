@@ -3,59 +3,53 @@ package com.fomjar.core.lio;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 public class TestLIO {
 
-    @Test
-    public void restWebSocketLIO() throws InterruptedException {
-        final int port = 3000;
+    private int port = 3000;
 
-        Thread threadServer = new Thread(() -> {
-            try {
-                LIOServer server = new WebSocketLIOServer();
-                server.listen(new LIOServerListener() {
-                    @Override
-                    public void connect(LIO lio) {
-                        lio.read((LIO lio1, byte[] buf, int off, int len) -> {
-                            System.out.println("from client: " + new String(buf, off, len));
-                        });
-                    }
-                    @Override
-                    public void disconnect(LIO lio) {}
+    private void startServer(LIOServer server) throws IOException {
+        server.listen(new LIOServerListener() {
+            @Override
+            public void connect(LIO lio) {
+                lio.read((LIO lio1, byte[] buf, int off, int len) -> {
+                    System.out.println("from client: " + new String(buf, off, len));
                 });
-
-                server.startup(port);
-
-                Thread.sleep(3000L);
-
-                server.shutdown();
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
             }
+            @Override
+            public void disconnect(LIO lio) {}
         });
-        threadServer.start();
+        server.startup(3000);
+    }
 
-        new Thread(() -> {
-            try {
-                LIO lio = new WebSocketLIO(new URI("ws://127.0.0.1:" + port + "/hello?a=1&b=2"), null);
-                while (!lio.isOpen()) {
-                    Thread.sleep(100L);
-                }
-                for (int i = 0; i < 3; i++) {
-                    lio.write("hello server!");
-                    Thread.sleep(200L);
-                }
-                lio.close();
-            } catch (IOException | InterruptedException | URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }).start();
+    private void startClient(LIO lio) throws IOException, InterruptedException {
+        while (!lio.isOpen()) {
+            Thread.sleep(100L);
+        }
+        for (int i = 0; i < 3; i++) {
+            lio.write("hello server!");
+            Thread.sleep(200L);
+        }
+        lio.close();
+    }
 
-        threadServer.join();
+    @Test
+    public void testWebSocketLIO() throws InterruptedException, URISyntaxException, IOException {
+        LIOServer server = new WebSocketLIOServer();
+        this.startServer(server);
+        this.startClient(new WebSocketLIO(new URI("ws://127.0.0.1:" + port + "/hello?a=1&b=2")));
+        server.shutdown();
+    }
 
-        assert true;
+    @Test
+    public void testTCPLIO() throws IOException, InterruptedException {
+        LIOServer server = new TCPLIOServer();
+        this.startServer(server);
+        this.startClient(new TCPLIO(new Socket("127.0.0.1", 3000)));
+        server.shutdown();
     }
 
 }

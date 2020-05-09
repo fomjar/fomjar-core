@@ -26,21 +26,16 @@ public class WebSocketLIOServer extends LIOServer {
         this.shutdown();
 
         this.server = new Server(port);
-        this.doStartup();
-        return this;
-    }
+        this.handler = new ServletContextHandler();
+        this.handler.setContextPath("/");
+        this.handler.addServlet(new ServletHolder(new Servlet()), "/*");
 
-    private void doStartup() throws IOException {
-        try {
-            this.handler = new ServletContextHandler();
-            this.handler.setContextPath("/");
-            this.handler.addServlet(new ServletHolder(new Servlet()), "/*");
+        this.server.setHandler(this.handler);
+        this.server.setStopAtShutdown(true);
 
-            this.server.setHandler(this.handler);
-            this.server.setStopAtShutdown(true);
-            this.server.start();
-        }
+        try {this.server.start();}
         catch (Exception e) {throw new IOException(e);}
+        return this;
     }
 
     @Override
@@ -91,7 +86,7 @@ public class WebSocketLIOServer extends LIOServer {
         }
 
         @OnWebSocketConnect
-        public void onWebSocketConnect(Session session) throws IOException {
+        public void onWebSocketConnect(Session session) {
             LIO lio = new WebSocketLIO(session);
             this.lios.put(this.id(session), lio);
             WebSocketLIOServer.this.doConnect(lio);
@@ -99,11 +94,13 @@ public class WebSocketLIOServer extends LIOServer {
 
         @OnWebSocketClose
         public void onWebSocketClose(Session session, int code, String reason) throws IOException {
-            WebSocketLIOServer.this.doDisconnect(this.lios.remove(this.id(session)));
+            LIO lio = this.lios.remove(this.id(session));
+            WebSocketLIOServer.this.doDisconnect(lio);
+            lio.close();
         }
 
         @OnWebSocketMessage
-        public void onWebSocketMessage(Session session, byte[] buf, int off, int len) throws IOException {
+        public void onWebSocketMessage(Session session, byte[] buf, int off, int len) {
             this.lios.get(this.id(session)).doRead(buf, off, len);
         }
 

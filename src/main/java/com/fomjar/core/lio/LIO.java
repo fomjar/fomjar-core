@@ -57,7 +57,7 @@ public abstract class LIO {
      */
     public LIO read(LIOReader reader) {
         if (null != reader) this.readers.add(reader);
-        this.doRead(new byte[0], 0, 0);
+        this.doRead(new byte[0], 0, 0); // 触发添加reader之前的缓存数据的读回调
         return this;
     }
 
@@ -85,15 +85,6 @@ public abstract class LIO {
         this.attach.put(key, val);
         return this;
     }
-
-    /**
-     * 更新网络连接具柄，更新相关配置。
-     *
-     * @param handler
-     * @return
-     * @throws IOException
-     */
-    public abstract LIO handler(Object handler) throws IOException;
 
     /**
      * 读取数据的逻辑的统一封装，由子类回调此逻辑。

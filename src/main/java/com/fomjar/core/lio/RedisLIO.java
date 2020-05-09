@@ -1,5 +1,6 @@
 package com.fomjar.core.lio;
 
+import com.fomjar.core.async.Async;
 import org.redisson.api.RBinaryStream;
 import org.redisson.api.RedissonClient;
 
@@ -16,9 +17,30 @@ public class RedisLIO extends LIO {
     private byte[]          buf;
     private boolean         isOpen;
 
-    public RedisLIO(RedissonClient redisson, String channel) throws IOException {
+    public RedisLIO(RedissonClient redisson, String channel) {
         this.channel = channel;
-        this.handler(redisson);
+        this.redisson = redisson;
+
+        RBinaryStream binaryStream = this.redisson.getBinaryStream(this.channel);
+        this.inputStream    = binaryStream.getInputStream();
+        this.outputStream   = binaryStream.getOutputStream();
+        this.isOpen         = true;
+        this.buf            = new byte[1024 * 4];
+
+        Async.pool(() -> {
+            try {
+                while (this.isOpen()) {
+                    int len = this.inputStream.read(this.buf);
+                    if (-1 == len)  break;
+                    if (0 < len)    this.doRead(this.buf, 0, len);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {this.close();}
+                catch (IOException e) {e.printStackTrace();}
+            }
+        });
     }
 
     @Override
@@ -29,48 +51,15 @@ public class RedisLIO extends LIO {
     }
 
     @Override
-    public LIO handler(Object handler) throws IOException {
-        try {this.close();}
-        catch (IOException e) {e.printStackTrace();}
-
-        this.redisson = (RedissonClient) handler;
-        this.setup();
-        return this;
-    }
-
-    private void setup() {
-        RBinaryStream binaryStream = this.redisson.getBinaryStream(this.channel);
-        this.inputStream    = binaryStream.getInputStream();
-        this.outputStream   = binaryStream.getOutputStream();
-        this.isOpen         = true;
-        this.buf            = new byte[1024 * 4];
-        Pool.submit(() -> {
-            while (this.isOpen()) {
-                try {
-                    int len = this.inputStream.read(this.buf);
-                    if (-1 == len)  break;
-                    if (0 < len)    this.doRead(this.buf, 0, len);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    break;
-                }
-            }
-            try {this.close();}
-            catch (IOException e) {e.printStackTrace();}
-        });
-    }
-
-    @Override
     public boolean isOpen() {
         return this.isOpen;
     }
 
     @Override
     public void close() throws IOException {
-        // the redissonClient instance is used everywhere
-        // do not close it
-        this.redisson.getBinaryStream(this.channel).delete();
         this.isOpen = false;
+        this.redisson.getBinaryStream(this.channel).delete();
+        // Do not close redisson client.
     }
 
     @Override
