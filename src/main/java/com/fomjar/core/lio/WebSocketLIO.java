@@ -62,8 +62,8 @@ public class WebSocketLIO extends LIO {
     @Override
     public void close() throws IOException {
         try {
-            if (null != this.session)   this.session.close();
             if (null != this.client)    this.client.stop();
+            if (null != this.session)   this.session.close();
         } catch (Exception e) {
             if (e instanceof IOException)   throw (IOException) e;
             else                            throw new IOException(e);
