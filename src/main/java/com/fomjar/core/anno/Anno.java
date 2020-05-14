@@ -103,6 +103,7 @@ public abstract class Anno {
      * @param types
      * @return
      */
+    @SafeVarargs
     public static Annotation any(Annotation[] annotations, Class<? extends Annotation>... types) {
         for (Class<? extends Annotation> type : types) {
             for (Annotation annotation : annotations) {

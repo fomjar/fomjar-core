@@ -64,7 +64,7 @@ public class TestAnnoStatic {
     }
 
     @SuppressWarnings("unchecked")
-    @Test
+//    @Test
     public void testScanController() throws Exception {
         Anno.scan(new URLClassLoader(new URL[]{
                         new File("/Users/fomjar/Documents/work/code/df/df-common/target/classes").toURI().toURL(),

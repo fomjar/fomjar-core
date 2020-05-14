@@ -33,7 +33,7 @@ public class FomjarCoreAutoConfiguration {
     private static final String prefix = "fomjar.core";
 
     @SuppressWarnings("unchecked")
-    private static <T> T ifnull(Object t0, T t1) {
+    private static <T> T ifnull(T t0, T t1) {
         if (null != t0) return (T) t1.getClass().cast(t0);
         return t1;
     }
@@ -70,7 +70,7 @@ public class FomjarCoreAutoConfiguration {
         return null != Async.pool
                 ? Async.pool
                 : (Async.pool = Executors.newScheduledThreadPool(
-                    ifnull(Props.get(prefix + ".pool.size"), Async.DEFAULT_POOL_SIZE),
+                    ifnull(Integer.valueOf(Props.get(prefix + ".pool.size")), Async.DEFAULT_POOL_SIZE),
                     new SimpleThreadFactory("main-pool")));
     }
 
@@ -80,9 +80,9 @@ public class FomjarCoreAutoConfiguration {
     })
     public RedissonClient redisson() {
         String  host    = ifnull(Props.get(prefix + ".redis.host"), "127.0.0.1");
-        int     port    = ifnull(Props.get(prefix + ".redis.port"), 6379);
+        int     port    = ifnull(Integer.valueOf(Props.get(prefix + ".redis.port")), 6379);
         String  pass    = ifnull(Props.get(prefix + ".redis.pass"), null);
-        int     db      = ifnull(Props.get(prefix + ".redis.db"),   0);
+        int     db      = ifnull(Integer.valueOf(Props.get(prefix + ".redis.db")),   0);
 
         Config config = new Config();
         config.useSingleServer()

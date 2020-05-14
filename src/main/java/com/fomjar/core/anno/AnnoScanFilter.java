@@ -10,6 +10,7 @@ public interface AnnoScanFilter {
 
     boolean filter(Annotation[] annotations);
 
+    @SafeVarargs
     static AnnoScanFilter all(Class<? extends Annotation>... types) {
         return annotations -> {
             for (Class<? extends Annotation> type : types) {

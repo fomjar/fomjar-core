@@ -21,7 +21,7 @@ public class Beans implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@SuppressWarnings("NullableProblems") ApplicationContext applicationContext) throws BeansException {
         Beans.applicationContext = applicationContext;
     }
 
@@ -37,6 +37,7 @@ public class Beans implements ApplicationContextAware {
         return Beans.applicationContext.getBean(name, type);
     }
 
+    @SafeVarargs
     public static Map<String, Object> get(Class<? extends Annotation>... types) {
         if (null == types || 0 == types.length) return null;
 
