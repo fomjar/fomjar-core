@@ -106,7 +106,7 @@ System.out.println(Struct.call("123456", "substring", 1, 4)); // "234"
 常量修改：
 ```java
 Struct.setFinalDouble(Double.class, "MAX_VALUE", 1.1D);
-System.out.println(Struct.get(Double.class, "MAX_VALUE")); // 1.1
+System.out.println(Double.MAX_VALUE); // 1.1
 
 String s = "12345";
 Struct.setFinalObject(s, "value", new char[] {'a', 'b', 'c', 'd', 'e'}); // "abcde"

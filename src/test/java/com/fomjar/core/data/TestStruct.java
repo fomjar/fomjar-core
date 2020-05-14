@@ -39,13 +39,13 @@ public class TestStruct {
         Struct.setFinalFloat(Float.class,       "MAX_VALUE", 1.1F);
         Struct.setFinalDouble(Double.class,     "MAX_VALUE", 1.1D);
 //        System.out.println(DS.get(Boolean.class, "TRUE"));
-        System.out.println(Struct.get(Byte.class,       "MAX_VALUE"));
-        System.out.println(Struct.get(Character.class,  "MAX_VALUE"));
-        System.out.println(Struct.get(Short.class,      "MAX_VALUE"));
-        System.out.println(Struct.get(Integer.class,    "MAX_VALUE"));
-        System.out.println(Struct.get(Long.class,       "MAX_VALUE"));
-        System.out.println(Struct.get(Float.class,      "MAX_VALUE"));
-        System.out.println(Struct.get(Double.class,     "MAX_VALUE"));
+        System.out.println(Byte.MAX_VALUE);
+        System.out.println(Character.MAX_VALUE);
+        System.out.println(Short.MAX_VALUE);
+        System.out.println(Integer.MAX_VALUE);
+        System.out.println(Long.MAX_VALUE);
+        System.out.println(Float.MAX_VALUE);
+        System.out.println(Double.MAX_VALUE);
 
         String s = "12345";
         Struct.setFinalObject(s, "value", new char[] {'a', 'b', 'c', 'd', 'e'});
