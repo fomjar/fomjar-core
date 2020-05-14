@@ -225,7 +225,7 @@ public class FomjarCoreAutoConfiguration {
                         public void disconnect(LIO lio) {
                         }
                     });
-                    System.out.println(String.format("LIO controller scanned: %s.%s", clazz.getSimpleName(), method.getName()));
+                    System.out.println(String.format("LIO controller scanned: %s.%s()", clazz.getSimpleName(), method.getName()));
                 }
                 if (null != Anno.any(annotations, LIOConnect.class)) {
                     finalServer.listen(new LIOServerListener() {
