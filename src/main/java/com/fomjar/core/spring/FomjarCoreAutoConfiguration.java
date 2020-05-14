@@ -26,6 +26,8 @@ import com.fomjar.core.oss.OSS;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -45,6 +47,7 @@ import java.util.concurrent.Executors;
 @Configuration
 public class FomjarCoreAutoConfiguration {
 
+    private static final Logger logger = LoggerFactory.getLogger(FomjarCoreAutoConfiguration.class);
     private static final String prefix = "fomjar.core";
 
     @SuppressWarnings("unchecked")
@@ -155,7 +158,7 @@ public class FomjarCoreAutoConfiguration {
             prefix + ".lio.package",
     })
     public LIOServer lioServer() throws Exception {
-        System.out.println("========");
+        logger.info("========");
 
         String pkg  = Props.get(prefix + ".lio.package");
         String type = ifnull(Props.get(prefix + ".lio.type"), "websocket");
@@ -225,7 +228,7 @@ public class FomjarCoreAutoConfiguration {
                         public void disconnect(LIO lio) {
                         }
                     });
-                    System.out.println(String.format("LIO controller scanned: %s.%s()", clazz.getSimpleName(), method.getName()));
+                    logger.info("LIO controller scanned: {}.{}()", clazz.getSimpleName(), method.getName());
                 }
                 if (null != Anno.any(annotations, LIOConnect.class)) {
                     finalServer.listen(new LIOServerListener() {
@@ -268,8 +271,8 @@ public class FomjarCoreAutoConfiguration {
         });
 
         server.startup(port);
-        System.out.println(String.format("Started LIO (%s) Server at port: %d", type, port));
-        System.out.println("========");
+        logger.info("Started LIO ({}) Server at port: {}", type, port);
+        logger.info("========");
         return server;
     }
 

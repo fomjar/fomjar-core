@@ -41,4 +41,9 @@ public class TestEL {
         System.out.println(this.el.eval("Math.sqrt(2)"));
     }
 
+    @Test
+    public void testTemplate() {
+        System.out.println(this.el.eval("'123' + 'abc'"));
+    }
+
 }

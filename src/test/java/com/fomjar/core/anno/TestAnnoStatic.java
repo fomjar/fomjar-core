@@ -77,7 +77,7 @@ public class TestAnnoStatic {
                         new File("/Users/fomjar/Documents/work/code/df/df-video/target/classes").toURI().toURL(),
                 }),
                 "com.oceangreate.df",
-                 null,
+                null,
                 AnnoScanFilter.any(Controller.class, RestController.class),
                 new AnnoScanAdapter() {
                     @Override
