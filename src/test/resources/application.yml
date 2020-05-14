@@ -20,3 +20,9 @@ fomjar:
 #      ak:
 #      sk:
 #      bucket:
+    lio:
+      package: com.fomjar.core
+#      type: websocket
+#      type: socket-io
+#      type: tcp
+#      port: 9001

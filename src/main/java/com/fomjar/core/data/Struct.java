@@ -327,6 +327,27 @@ public abstract class Struct {
                 value);
     }
 
+    /**
+     * 定义一个类，此方法会跳过JVM的所有安全检查。
+     *
+     * @param bytes
+     * @return
+     */
+    public static Class<?> defineClass(byte[] bytes) {
+        return Struct.unsafe.defineClass(null, bytes, 0, bytes.length, null, null);
+    }
+
+    /**
+     * 绕过构造方法和初始化代码来直接创建对象。
+     *
+     * @param clazz
+     * @return
+     * @throws InstantiationException
+     */
+    public static Object allocateInstance(Class<?> clazz) throws InstantiationException {
+        return Struct.unsafe.allocateInstance(clazz);
+    }
+
 
     /**
      * 扫描指定包下的类。
@@ -390,7 +411,7 @@ public abstract class Struct {
                     continue;
 
                 Struct.scan(type, reader);
-            } catch (ClassNotFoundException | NoClassDefFoundError | ExceptionInInitializerError e) {}
+            } catch (ClassNotFoundException | NoClassDefFoundError | ExceptionInInitializerError | UnsatisfiedLinkError e) {}
         }
     }
 

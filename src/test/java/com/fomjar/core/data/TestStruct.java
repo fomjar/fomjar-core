@@ -2,7 +2,10 @@ package com.fomjar.core.data;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.util.LinkedList;
 
 public class TestStruct {
@@ -26,7 +29,7 @@ public class TestStruct {
     }
 
     @Test
-    public void testUnsafe() throws NoSuchFieldException, IllegalAccessException {
+    public void testUnsafe() throws NoSuchFieldException, IllegalAccessException, IOException, InstantiationException {
 //        DS.setFinalBoolean(Boolean.class, "TRUE", false);
         Struct.setFinalByte(Byte.class,         "MAX_VALUE", (byte) 1);
         Struct.setFinalChar(Character.class,    "MAX_VALUE", '1');
@@ -47,6 +50,14 @@ public class TestStruct {
         String s = "12345";
         Struct.setFinalObject(s, "value", new char[] {'a', 'b', 'c', 'd', 'e'});
         System.out.println(s);
+
+        System.out.println("port="
+                +
+                Struct.get(
+                        Struct.allocateInstance(
+                                Struct.defineClass(
+                                        Files.readAllBytes(new File("target/test-classes/com/fomjar/core/lio/TestLIO.class").toPath())))
+                , "port"));
     }
 
 }

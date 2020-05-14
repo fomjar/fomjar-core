@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class TestLIO {
+public class TestLIOStatic {
 
     private int port = 3000;
 

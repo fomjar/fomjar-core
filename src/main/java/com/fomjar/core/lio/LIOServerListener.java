@@ -7,8 +7,8 @@ package com.fomjar.core.lio;
  */
 public interface LIOServerListener {
 
-    void connect(LIO lio);
+    void connect(LIO lio) throws Exception;
 
-    void disconnect(LIO lio);
+    void disconnect(LIO lio) throws Exception;
 
 }
