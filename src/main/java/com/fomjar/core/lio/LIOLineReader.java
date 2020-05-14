@@ -1,16 +1,16 @@
-package com.fomjar.core.pio;
+package com.fomjar.core.lio;
 
 import com.fomjar.core.data.BufferedChannel;
 
-public abstract class PIOLineReader implements PIOReader {
+public abstract class LIOLineReader implements LIOReader {
 
     private BufferedChannel channel;
 
-    public PIOLineReader() {
+    public LIOLineReader() {
         this.channel = new BufferedChannel();
     }
 
-    public PIOLineReader(String charset) {
+    public LIOLineReader(String charset) {
         this.channel = new BufferedChannel(charset);
     }
 

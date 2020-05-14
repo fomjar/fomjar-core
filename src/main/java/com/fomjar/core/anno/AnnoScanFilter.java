@@ -6,11 +6,11 @@ import java.lang.annotation.Annotation;
  * Annotation scan filter.
  * @author fomjar
  */
-public interface AnnoFilter {
+public interface AnnoScanFilter {
 
     boolean filter(Annotation[] annotations);
 
-    static AnnoFilter all(Class<? extends Annotation>... types) {
+    static AnnoScanFilter all(Class<? extends Annotation>... types) {
         return annotations -> {
             for (Class<? extends Annotation> type : types) {
                 boolean exist = false;
@@ -27,7 +27,7 @@ public interface AnnoFilter {
     }
 
     @SafeVarargs
-    static AnnoFilter any(Class<? extends Annotation>... types) {
+    static AnnoScanFilter any(Class<? extends Annotation>... types) {
         return annotations -> {
             for (Class<? extends Annotation> type : types) {
                 for (Annotation annotation : annotations) {

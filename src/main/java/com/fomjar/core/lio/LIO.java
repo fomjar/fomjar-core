@@ -18,15 +18,19 @@ public abstract class LIO {
     private ByteArrayOutputStream   buffers = new ByteArrayOutputStream();
     private Map<String, Object>     attach;
 
+    public LIO writeLine(String line) throws IOException {
+        return this.write(line + System.lineSeparator());
+    }
+
     /**
      * 写入字符串。
      *
-     * @param data
+     * @param string
      * @return
      * @throws IOException
      */
-    public LIO write(String data) throws IOException {
-        return this.write(data.getBytes());
+    public LIO write(String string) throws IOException {
+        return this.write(string.getBytes());
     }
 
     /**
@@ -36,7 +40,9 @@ public abstract class LIO {
      * @return
      * @throws IOException
      */
-    public LIO write(byte[] buf) throws IOException {return this.write(buf, 0, buf.length);}
+    public LIO write(byte[] buf) throws IOException {
+        return this.write(buf, 0, buf.length);
+    }
 
     /**
      * 写入字节。
@@ -113,7 +119,7 @@ public abstract class LIO {
 
         if (0 < len) {
             for (LIOReader reader : this.readers) {
-                try {reader.read(this, buf, off, len);}
+                try {reader.read(buf, off, len);}
                 catch (Exception e) {e.printStackTrace();}
             }
         }

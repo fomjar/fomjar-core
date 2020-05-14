@@ -1,8 +1,8 @@
 package com.fomjar.core.anno;
 
-import com.fomjar.core.ds.DS;
-import com.fomjar.core.ds.DSFilter;
-import com.fomjar.core.ds.DSReader;
+import com.fomjar.core.data.Struct;
+import com.fomjar.core.data.StructScanFilter;
+import com.fomjar.core.data.StructScanReader;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -24,7 +24,7 @@ public abstract class Anno {
      * @param reader
      * @throws IOException
      */
-    public static void scan(String pack, AnnoReader reader) throws IOException {
+    public static void scan(String pack, AnnoScanReader reader) throws Exception {
         Anno.scan(Anno.class.getClassLoader(), pack, null, null, reader);
     }
 
@@ -36,7 +36,7 @@ public abstract class Anno {
      * @param reader
      * @throws IOException
      */
-    public static void scan(ClassLoader loader, String pack, AnnoReader reader) throws IOException {
+    public static void scan(ClassLoader loader, String pack, AnnoScanReader reader) throws Exception {
         Anno.scan(loader, pack, null, null, reader);
     }
 
@@ -44,13 +44,13 @@ public abstract class Anno {
      * 扫描指定包下的注解。
      *
      * @param pack
-     * @param dsFilter
-     * @param annoFilter class-level filter
+     * @param structScanFilter
+     * @param annoScanFilter class-level filter
      * @param reader
      * @throws IOException
      */
-    public static void scan(String pack, DSFilter dsFilter, AnnoFilter annoFilter, AnnoReader reader) throws IOException {
-        Anno.scan(Anno.class.getClassLoader(), pack, dsFilter, annoFilter, reader);
+    public static void scan(String pack, StructScanFilter structScanFilter, AnnoScanFilter annoScanFilter, AnnoScanReader reader) throws Exception {
+        Anno.scan(Anno.class.getClassLoader(), pack, structScanFilter, annoScanFilter, reader);
     }
 
     /**
@@ -58,37 +58,37 @@ public abstract class Anno {
      *
      * @param loader
      * @param pack
-     * @param dsFilter
-     * @param annoFilter class-level filter
+     * @param structScanFilter
+     * @param annoScanFilter class-level filter
      * @param reader
      * @throws IOException
      */
-    public static void scan(ClassLoader loader, String pack, DSFilter dsFilter, AnnoFilter annoFilter, AnnoReader reader) throws IOException {
-        DS.scan(loader, pack, dsFilter, new DSReader() {
+    public static void scan(ClassLoader loader, String pack, StructScanFilter structScanFilter, AnnoScanFilter annoScanFilter, AnnoScanReader reader) throws Exception {
+        Struct.scan(loader, pack, structScanFilter, new StructScanReader() {
             @Override
-            public void read(Class<?> type) {
-                if (null != annoFilter && !annoFilter.filter(type.getAnnotations()))
+            public void read(Class<?> type) throws Exception {
+                if (null != annoScanFilter && !annoScanFilter.filter(type.getAnnotations()))
                     return;
 
                 reader.read(type.getAnnotations(), type);
             }
             @Override
-            public void read(Class<?> type, Method method) {
-                if (null != annoFilter && !annoFilter.filter(type.getAnnotations()))
+            public void read(Class<?> type, Method method) throws Exception {
+                if (null != annoScanFilter && !annoScanFilter.filter(type.getAnnotations()))
                     return;
 
                 reader.read(method.getAnnotations(), type, method);
             }
             @Override
-            public void read(Class<?> type, Method method, Parameter parameter) {
-                if (null != annoFilter && !annoFilter.filter(type.getAnnotations()))
+            public void read(Class<?> type, Method method, Parameter parameter) throws Exception {
+                if (null != annoScanFilter && !annoScanFilter.filter(type.getAnnotations()))
                     return;
 
                 reader.read(parameter.getAnnotations(), type, method, parameter);
             }
             @Override
-            public void read(Class<?> type, Field field) {
-                if (null != annoFilter && !annoFilter.filter(type.getAnnotations()))
+            public void read(Class<?> type, Field field) throws Exception {
+                if (null != annoScanFilter && !annoScanFilter.filter(type.getAnnotations()))
                     return;
 
                 reader.read(field.getAnnotations(), type, field);

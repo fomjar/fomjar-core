@@ -15,8 +15,11 @@ public class TestLIO {
         server.listen(new LIOServerListener() {
             @Override
             public void connect(LIO lio) {
-                lio.read((LIO lio1, byte[] buf, int off, int len) -> {
-                    System.out.println("from client: " + new String(buf, off, len));
+                lio.read(new LIOLineReader() {
+                    @Override
+                    public void readLine(String line) throws Exception {
+                        System.out.println("from client: " + line);
+                    }
                 });
             }
             @Override
@@ -30,7 +33,7 @@ public class TestLIO {
             Thread.sleep(100L);
         }
         for (int i = 0; i < 3; i++) {
-            lio.write("hello server!");
+            lio.writeLine("hello server!");
             Thread.sleep(200L);
         }
         lio.close();

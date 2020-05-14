@@ -1,4 +1,4 @@
-package com.fomjar.core.ds;
+package com.fomjar.core.data;
 
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.core.env.StandardEnvironment;
@@ -20,7 +20,7 @@ import java.util.function.IntFunction;
  *
  * @author fomjar
  */
-public abstract class DS {
+public abstract class Struct {
 
     /**
      * 获取类内部定义的指定成员字段。范围包括各类访问权限及各级父类定义的。
@@ -52,7 +52,7 @@ public abstract class DS {
                 // 根据方法名和参数数量进行粗略判断
                 // 原因：在参数自动装箱的情况下，无法根据参数类型准确提取方法
                 // 误判：方法重载、存在自动装箱（含原始数据类型参数）、且参数数量相同的情况下，可能存在误判
-                for (Method m : DS.methods(clazz)) {
+                for (Method m : Struct.methods(clazz)) {
                     if (m.getName().equals(method)
                             && ((null == params && 0 == m.getParameterCount())
                                     || params.length == m.getParameterCount()))
@@ -99,7 +99,7 @@ public abstract class DS {
      * @throws NoSuchFieldException
      */
     public static Object get(Object object, String field) throws NoSuchFieldException, IllegalAccessException {
-        return DS.get(object, Object.class, field);
+        return Struct.get(object, Object.class, field);
     }
 
     /**
@@ -114,7 +114,7 @@ public abstract class DS {
      * @throws IllegalAccessException
      */
     public static <T> T get(Object object, Class<? extends T> result, String field) throws NoSuchFieldException, IllegalAccessException {
-        Field f = DS.field(object instanceof Class<?> ? (Class<?>) object : object.getClass(), field);
+        Field f = Struct.field(object instanceof Class<?> ? (Class<?>) object : object.getClass(), field);
 
         f.setAccessible(true);
         return result.cast(f.get(object));
@@ -130,7 +130,7 @@ public abstract class DS {
      * @throws IllegalAccessException
      */
     public static void set(Object object, String field, Object value) throws NoSuchFieldException, IllegalAccessException {
-        Field f = DS.field(object instanceof Class<?> ? (Class<?>) object : object.getClass(), field);
+        Field f = Struct.field(object instanceof Class<?> ? (Class<?>) object : object.getClass(), field);
 
         f.setAccessible(true);
         f.set(object, value);
@@ -148,7 +148,7 @@ public abstract class DS {
      * @throws InvocationTargetException
      */
     public static Object call(Object object, String method, Object... params) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return DS.call(object, Object.class, method, params);
+        return Struct.call(object, Object.class, method, params);
     }
 
     /**
@@ -165,7 +165,7 @@ public abstract class DS {
      * @throws InvocationTargetException
      */
     public static <T> T call(Object object, Class<? extends T> result, String method, Object... params) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Method m = DS.method(object instanceof Class<?> ? (Class<?>) object : object.getClass(),
+        Method m = Struct.method(object instanceof Class<?> ? (Class<?>) object : object.getClass(),
                 method,
                 null == params ? null : Arrays.stream(params).map(Object::getClass).toArray((IntFunction<Class<?>[]>) Class[]::new));
 
@@ -178,7 +178,8 @@ public abstract class DS {
      */
     public static Unsafe unsafe = null;
     static {
-        try {DS.unsafe = DS.get(Unsafe.class, Unsafe.class, "theUnsafe");}
+        try {
+            Struct.unsafe = Struct.get(Unsafe.class, Unsafe.class, "theUnsafe");}
         catch (NoSuchFieldException | IllegalAccessException e) {e.printStackTrace();}
     }
 
@@ -191,10 +192,10 @@ public abstract class DS {
      * @throws NoSuchFieldException
      */
     public static void setFinalBoolean(Object object, String field, boolean value) throws NoSuchFieldException {
-        DS.unsafe.putBoolean(object,
+        Struct.unsafe.putBoolean(object,
                 object instanceof Class<?>
-                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
-                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                        ? Struct.unsafe.staticFieldOffset(Struct.field((Class<?>) object, field))
+                        : Struct.unsafe.objectFieldOffset(Struct.field(object.getClass(), field)),
                 value);
     }
 
@@ -207,10 +208,10 @@ public abstract class DS {
      * @throws NoSuchFieldException
      */
     public static void setFinalByte(Object object, String field, byte value) throws NoSuchFieldException {
-        DS.unsafe.putByte(object,
+        Struct.unsafe.putByte(object,
                 object instanceof Class<?>
-                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
-                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                        ? Struct.unsafe.staticFieldOffset(Struct.field((Class<?>) object, field))
+                        : Struct.unsafe.objectFieldOffset(Struct.field(object.getClass(), field)),
                 value);
     }
 
@@ -223,10 +224,10 @@ public abstract class DS {
      * @throws NoSuchFieldException
      */
     public static void setFinalChar(Object object, String field, char value) throws NoSuchFieldException {
-        DS.unsafe.putChar(object,
+        Struct.unsafe.putChar(object,
                 object instanceof Class<?>
-                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
-                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                        ? Struct.unsafe.staticFieldOffset(Struct.field((Class<?>) object, field))
+                        : Struct.unsafe.objectFieldOffset(Struct.field(object.getClass(), field)),
                 value);
     }
 
@@ -239,10 +240,10 @@ public abstract class DS {
      * @throws NoSuchFieldException
      */
     public static void setFinalShort(Object object, String field, short value) throws NoSuchFieldException {
-        DS.unsafe.putShort(object,
+        Struct.unsafe.putShort(object,
                 object instanceof Class<?>
-                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
-                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                        ? Struct.unsafe.staticFieldOffset(Struct.field((Class<?>) object, field))
+                        : Struct.unsafe.objectFieldOffset(Struct.field(object.getClass(), field)),
                 value);
     }
 
@@ -255,10 +256,10 @@ public abstract class DS {
      * @throws NoSuchFieldException
      */
     public static void setFinalInt(Object object, String field, int value) throws NoSuchFieldException {
-        DS.unsafe.putInt(object,
+        Struct.unsafe.putInt(object,
                 object instanceof Class<?>
-                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
-                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                        ? Struct.unsafe.staticFieldOffset(Struct.field((Class<?>) object, field))
+                        : Struct.unsafe.objectFieldOffset(Struct.field(object.getClass(), field)),
                 value);
     }
 
@@ -271,10 +272,10 @@ public abstract class DS {
      * @throws NoSuchFieldException
      */
     public static void setFinalLong(Object object, String field, long value) throws NoSuchFieldException {
-        DS.unsafe.putLong(object,
+        Struct.unsafe.putLong(object,
                 object instanceof Class<?>
-                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
-                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                        ? Struct.unsafe.staticFieldOffset(Struct.field((Class<?>) object, field))
+                        : Struct.unsafe.objectFieldOffset(Struct.field(object.getClass(), field)),
                 value);
     }
 
@@ -287,10 +288,10 @@ public abstract class DS {
      * @throws NoSuchFieldException
      */
     public static void setFinalFloat(Object object, String field, float value) throws NoSuchFieldException {
-        DS.unsafe.putFloat(object,
+        Struct.unsafe.putFloat(object,
                 object instanceof Class<?>
-                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
-                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                        ? Struct.unsafe.staticFieldOffset(Struct.field((Class<?>) object, field))
+                        : Struct.unsafe.objectFieldOffset(Struct.field(object.getClass(), field)),
                 value);
     }
 
@@ -303,10 +304,10 @@ public abstract class DS {
      * @throws NoSuchFieldException
      */
     public static void setFinalDouble(Object object, String field, double value) throws NoSuchFieldException {
-        DS.unsafe.putDouble(object,
+        Struct.unsafe.putDouble(object,
                 object instanceof Class<?>
-                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
-                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                        ? Struct.unsafe.staticFieldOffset(Struct.field((Class<?>) object, field))
+                        : Struct.unsafe.objectFieldOffset(Struct.field(object.getClass(), field)),
                 value);
     }
 
@@ -319,10 +320,10 @@ public abstract class DS {
      * @throws NoSuchFieldException
      */
     public static void setFinalObject(Object object, String field, Object value) throws NoSuchFieldException {
-        DS.unsafe.putObject(object,
+        Struct.unsafe.putObject(object,
                 object instanceof Class<?>
-                        ? DS.unsafe.staticFieldOffset(DS.field((Class<?>) object, field))
-                        : DS.unsafe.objectFieldOffset(DS.field(object.getClass(), field)),
+                        ? Struct.unsafe.staticFieldOffset(Struct.field((Class<?>) object, field))
+                        : Struct.unsafe.objectFieldOffset(Struct.field(object.getClass(), field)),
                 value);
     }
 
@@ -334,8 +335,8 @@ public abstract class DS {
      * @param reader
      * @throws IOException
      */
-    public static void scan(String pack, DSReader reader) throws IOException {
-        DS.scan(DS.class.getClassLoader(), pack, null, reader);
+    public static void scan(String pack, StructScanReader reader) throws Exception {
+        Struct.scan(Struct.class.getClassLoader(), pack, null, reader);
     }
 
     /**
@@ -346,8 +347,8 @@ public abstract class DS {
      * @param reader
      * @throws IOException
      */
-    public static void scan(String pack, DSFilter filter, DSReader reader) throws IOException {
-        DS.scan(DS.class.getClassLoader(), pack, filter, reader);
+    public static void scan(String pack, StructScanFilter filter, StructScanReader reader) throws Exception {
+        Struct.scan(Struct.class.getClassLoader(), pack, filter, reader);
     }
 
     /**
@@ -358,8 +359,8 @@ public abstract class DS {
      * @param reader
      * @throws IOException
      */
-    public static void scan(ClassLoader loader, String pack, DSReader reader) throws IOException {
-        DS.scan(loader, pack, null, reader);
+    public static void scan(ClassLoader loader, String pack, StructScanReader reader) throws Exception {
+        Struct.scan(loader, pack, null, reader);
     }
 
     private static final PropertyResolver env = new StandardEnvironment();
@@ -373,34 +374,36 @@ public abstract class DS {
      * @param reader
      * @throws IOException
      */
-    public static void scan(ClassLoader loader, String pack, DSFilter filter, DSReader reader) throws IOException {
+    public static void scan(ClassLoader loader, String pack, StructScanFilter filter, StructScanReader reader) throws Exception {
         String resourcePath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
-                + ClassUtils.convertClassNameToResourcePath(DS.env.resolveRequiredPlaceholders(pack))
+                + ClassUtils.convertClassNameToResourcePath(Struct.env.resolveRequiredPlaceholders(pack))
                 + "/**/*.class";
         ResourcePatternResolver res = new PathMatchingResourcePatternResolver(loader);
         MetadataReaderFactory reg = new SimpleMetadataReaderFactory(loader);
 
         for (Resource resource : res.getResources(resourcePath)) {
+            Class<?> type = null;
             try {
-                Class<?> type = Class.forName(reg.getMetadataReader(resource).getClassMetadata().getClassName(), true, loader);
+                type = Class.forName(reg.getMetadataReader(resource).getClassMetadata().getClassName(), true, loader);
+
                 if (null != filter && !filter.filter(type))
                     continue;
 
-                DS.scan(type, reader);
+                Struct.scan(type, reader);
             } catch (ClassNotFoundException | NoClassDefFoundError | ExceptionInInitializerError e) {}
         }
     }
 
-    private static void scan(Class<?> type, DSReader reader) {
+    private static void scan(Class<?> type, StructScanReader reader) throws Exception {
         // Class-level
         reader.read(type);
 
         // Fields within this class and super classes
-        for (Field field : DS.fields(type))
+        for (Field field : Struct.fields(type))
             reader.read(type, field);
 
         // Methods within this class and super classes
-        for (Method method : DS.methods(type)) {
+        for (Method method : Struct.methods(type)) {
             reader.read(type, method);
 
             // Method parameters

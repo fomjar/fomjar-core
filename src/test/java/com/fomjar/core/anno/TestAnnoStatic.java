@@ -1,6 +1,6 @@
 package com.fomjar.core.anno;
 
-import com.fomjar.core.ds.DS;
+import com.fomjar.core.data.Struct;
 import org.junit.Test;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,8 +21,8 @@ import java.net.URLClassLoader;
 public class TestAnnoStatic {
 
     @Test
-    public void testScanSelf() throws IOException {
-        Anno.scan("com.fomjar.core", new AnnoAdapter() {
+    public void testScanSelf() throws Exception {
+        Anno.scan("com.fomjar.core", new AnnoScanAdapter() {
 
             @Override
             public void read(Annotation[] annotations, Class<?> clazz) {
@@ -65,7 +65,7 @@ public class TestAnnoStatic {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testScanController() throws IOException {
+    public void testScanController() throws Exception {
         Anno.scan(new URLClassLoader(new URL[]{
                         new File("/Users/fomjar/Documents/work/code/df/df-common/target/classes").toURI().toURL(),
                         new File("/Users/fomjar/Documents/work/code/df/df-iot/target/classes").toURI().toURL(),
@@ -78,8 +78,8 @@ public class TestAnnoStatic {
                 }),
                 "com.oceangreate.df",
                  null,
-                AnnoFilter.any(Controller.class, RestController.class),
-                new AnnoAdapter() {
+                AnnoScanFilter.any(Controller.class, RestController.class),
+                new AnnoScanAdapter() {
                     @Override
                     public void read(Annotation[] annotations, Class<?> type, Method method) {
                         Annotation anno0 = Anno.any(type.getAnnotations(), RequestMapping.class, GetMapping.class, PostMapping.class);
@@ -89,8 +89,8 @@ public class TestAnnoStatic {
                         String[] path0 = new String[0];
                         String[] path1 = new String[0];
                         try {
-                            path0 = null == anno0 ? new String[] {} : DS.call(anno0, String[].class, "value");
-                            path1 = DS.call(anno1, String[].class, "value");
+                            path0 = null == anno0 ? new String[] {} : Struct.call(anno0, String[].class, "value");
+                            path1 = Struct.call(anno1, String[].class, "value");
                         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                             e.printStackTrace();
                         }

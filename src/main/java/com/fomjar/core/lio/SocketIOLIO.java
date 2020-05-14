@@ -13,7 +13,7 @@ public class SocketIOLIO extends LIO {
 
     private SocketIOClient client;
 
-    public SocketIOLIO(SocketIOClient client) throws IOException {
+    SocketIOLIO(SocketIOClient client) throws IOException {
         this.client = client;
 
         Map<String, Object> args = new HashMap<>();

@@ -1,19 +1,19 @@
-package com.fomjar.core.ds;
+package com.fomjar.core.data;
 
 /**
  * DS scan filter.
  *
  * @author fomjar
  */
-public interface DSFilter {
+public interface StructScanFilter {
 
     boolean filter(Class<?> type);
 
-    static DSFilter name(String name) {
+    static StructScanFilter name(String name) {
         return type -> type.getName().contains(name);
     }
 
-    static DSFilter type(Class<?> type) {
+    static StructScanFilter type(Class<?> type) {
         return type::isAssignableFrom;
     }
 

@@ -7,6 +7,6 @@ package com.fomjar.core.lio;
  */
 public interface LIOReader {
 
-    void read(LIO lio, byte[] buf, int off, int len) throws Exception;
+    void read(byte[] buf, int off, int len) throws Exception;
 
 }
