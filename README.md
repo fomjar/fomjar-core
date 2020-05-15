@@ -11,19 +11,21 @@
 - *dist*: 分布式包。各类分布式中间件的统一封装。在Spring环境下会进行Bean的自动配置。分布式锁、分布式调度
 - *el*: 表达式包。各类模板引擎和表达式引擎的统一封装。也可以用来做Web端推送。在Spring环境下会进行Bean的自动配置。支持注册自定义变量、自定义方法
 - *lio*: 长连接包。各类网络协议的长连接的统一封装。在Spring环境下提供了基于注解的LIO容器自动配置。Websocket、Socket-IO、TCP、Redis
-- *mq*: 消息队列包。各类消息中间件的统一封装。在Spring环境下会进行Bean的自动配置。AliyunMQ、RedisMQ。
+- *mq*: 消息队列包。各类消息中间件的统一封装。在Spring环境下会进行Bean的自动配置。AliyunMQ、RedisMQ
 - *oss*: 对象存储包。各类对象存储中间件的统一封装。在Spring环境下会进行Bean的自动配置。AliyunOSS、MinioOSS
 - *pio*: 进程IO包。操作系统进程的IO异步读写工具
 - *spring*: Spring支持包。框架的Spring启动器自动配置以及Spring相关工具集。动态获取Bean、动态获取配置项等
 
 ## DEMO
 
-### 算法-algo
+### algo(算法)
+支持的摘要算法：md2、md5、sha1、sha256、sha384、sha512、crc32。
 ```java
 System.out.println(Digest.md5("password"));
 ```
 
-### 注解-anno
+### anno(注解)
+简单的注解扫描
 ```java
 Anno.scan("com.fomjar.core", new AnnoScanAdapter() {
     @Override
@@ -77,7 +79,25 @@ Anno.scan(new URLClassLoader(new URL[]{
         });
 ```
 
-### 异步-async
+### async(异步)
+异步工具库对异步执行操作做了优化，对系统整体性能有较好的提升。
+```java
+import static com.fomjar.core.async.Async.*;
+
+// 异步执行
+async(() -> {
+    System.out.println(Thread.currentThread().getName() + ": " + System.currentTimeMillis());
+});
+// 异步队列执行，默认在主异步队列中执行
+queue(() -> {
+    System.out.println(Thread.currentThread().getName() + ": " + System.currentTimeMillis());
+});
+// 异步线程池执行
+pool(() -> {
+    System.out.println(Thread.currentThread().getName() + ": " + System.currentTimeMillis());
+});
+```
+Spring下的异步支持：
 ```java
 @Autowired
 private ExecutorService queue;
@@ -93,7 +113,7 @@ for (int i = 0; i < 8; i++) {
 this.queue.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 ```
 
-### 数据结构-data
+### data(数据结构)
 集合操作：
 ```java
 Struct.wrapList().add(3).add(4).add(5).get().size(); // 3
@@ -112,7 +132,8 @@ String s = "12345";
 Struct.setFinalObject(s, "value", new char[] {'a', 'b', 'c', 'd', 'e'}); // "abcde"
 ```
 
-### 分布式-dist
+### dist(分布式)
+目前支持基于Redis的实现。
 分布式调度：
 ```java
 @Autowired
@@ -137,7 +158,8 @@ this.dist.lock(() -> {
 }, name);
 ```
 
-### 表达式-el
+### el(表达式)
+实现基于Aviator和Freemarker，整体语法基本相同，默认注册了很多有用的工具函数，支持注册中文变量。
 ```java
 @Autowired
 private EL el;
@@ -167,7 +189,8 @@ System.out.println(this.el.eval("Math.sqrt(2)")); // "1.4142135623730951"
 System.out.println(this.el.eval("'123' + 'abc'")); // "123abc"
 ```
 
-### 长连接-lio
+### lio(长连接)
+实现基于TCP、Websocket、SocketIO、Redis。
 ```java
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {TestFomjarCoreApplication.class})
@@ -207,7 +230,8 @@ public class TestLIOSpring {
 }
 ```
 
-### 消息队列-mq
+### mq(消息队列)
+实现基于AliyunMQ和Redis。
 ```java
 @Autowired
 private MQ mq;
@@ -223,7 +247,8 @@ for (int i = 0; i < 3; i++) {
 }
 ```
 
-### 对象存储-oss
+### oss(对象存储)
+实现基于AliyunOSS和Minio。
 ```java
 @Autowired
 private OSS oss;
@@ -232,7 +257,8 @@ long time = System.currentTimeMillis();
 System.out.println(oss.upload("test-" + time + ".txt", ("hello world! " + time).getBytes())); // http://url
 ```
 
-### 进程IO-pio
+### pio(进程IO)
+进程读为异步、写为同步。
 ```java
 new PIO()
     .readInput(new PIOLineReader() {
