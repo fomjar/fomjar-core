@@ -1,5 +1,7 @@
 package com.fomjar.core.async;
 
+import com.fomjar.core.data.Struct;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,14 +16,22 @@ import java.util.concurrent.Future;
  */
 public abstract class Async {
 
-    public static final ExecutorService queue   = QueuedExecutor.main;
-    public static       ExecutorService pool    = null;
-    public static final int DEFAULT_POOL_SIZE   = 10;
+    private static final ExecutorService queue  = QueuedExecutor.main;
+    private static final ExecutorService pool   = null; // initialize later
+    private static final int DEFAULT_POOL_SIZE  = 10;
 
-    private static void check() {
-        if (null == Async.pool)
-            Async.pool = Executors.newScheduledThreadPool(Async.DEFAULT_POOL_SIZE,
-                    new SimpleThreadFactory("main-pool"));
+    private static ExecutorService checkPool() {
+        if (null == Async.pool) {
+            synchronized (Async.class) {
+                if (null == Async.pool) {
+                    ExecutorService pool = Executors.newScheduledThreadPool(Async.DEFAULT_POOL_SIZE,
+                            new SimpleThreadFactory("main-pool"));
+                    try { Struct.setFinalObject(Async.class, "pool", pool); }
+                    catch (NoSuchFieldException e) { e.printStackTrace(); }
+                }
+            }
+        }
+        return Async.pool;
     }
 
     public static Future<?> async(Runnable task) {
@@ -49,18 +59,15 @@ public abstract class Async {
     }
 
     public static Future<?> pool(Runnable task) {
-        Async.check();
-        return Async.pool.submit(task);
+        return Async.checkPool().submit(task);
     }
 
     public static <T> Future<T> pool(Runnable task, T result) {
-        Async.check();
-        return Async.pool.submit(task, result);
+        return Async.checkPool().submit(task, result);
     }
 
     public static <T> Future<T> pool(Callable<T> task) {
-        Async.check();
-        return Async.pool.submit(task);
+        return Async.checkPool().submit(task);
     }
 
 }

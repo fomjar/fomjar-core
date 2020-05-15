@@ -8,6 +8,7 @@ import com.fomjar.core.async.Async;
 import com.fomjar.core.async.EventQueue;
 import com.fomjar.core.async.QueuedExecutor;
 import com.fomjar.core.async.SimpleThreadFactory;
+import com.fomjar.core.data.Struct;
 import com.fomjar.core.dist.Dist;
 import com.fomjar.core.dist.RedisDist;
 import com.fomjar.core.el.AviatorEL;
@@ -84,12 +85,18 @@ public class FomjarCoreAutoConfiguration {
 
     @Bean
     @Lazy
-    public ExecutorService pool() {
-        return null != Async.pool
-                ? Async.pool
-                : (Async.pool = Executors.newScheduledThreadPool(
-                    ifnull(Props.get(prefix + ".pool.size"), Async.DEFAULT_POOL_SIZE),
-                    new SimpleThreadFactory("main-pool")));
+    public ExecutorService pool() throws NoSuchFieldException, IllegalAccessException {
+        synchronized (Async.class) {
+            ExecutorService pool = Struct.get(Async.class, ExecutorService.class, "pool");
+            if (null != pool) return pool;
+
+            pool = Executors.newScheduledThreadPool(
+                    ifnull(Props.get(prefix + ".pool.size"), 10),
+                    new SimpleThreadFactory("main-pool"));
+            Struct.setFinalObject(Async.class, "pool", pool);
+
+            return pool;
+        }
     }
 
     @Bean
