@@ -15,7 +15,7 @@ public class TCPLIOServer extends LIOServer {
         this.shutdown();
 
         this.server = new ServerSocket(port);
-        Async.pool(() -> {
+        Async.async(() -> {
             while (!this.server.isClosed()) {
                 try {
                     Socket socket = this.server.accept();

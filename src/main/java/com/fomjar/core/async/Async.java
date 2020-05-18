@@ -1,11 +1,12 @@
 package com.fomjar.core.async;
 
-import com.fomjar.core.data.Struct;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
 
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 /**
  * 异步执行器汇总工具集。<br/>
@@ -16,143 +17,66 @@ import java.util.concurrent.*;
  */
 public abstract class Async {
 
-    private static final ExecutorService queue  = QueuedExecutor.main;
-    private static final ExecutorService pool   = Executors.newScheduledThreadPool(Async.DEFAULT_POOL_SIZE, new SimpleThreadFactory("main-pool"));
-    private static final int DEFAULT_POOL_SIZE  = 10;
-    private static final Timer timer = new Timer("main-timer", true);
+    private static final ThreadPoolTaskScheduler pool = new ThreadPoolTaskScheduler();
+    static {
+        Async.pool.setThreadFactory(new SimpleThreadFactory("main-pool"));
+        Async.pool.initialize();
+        Async.poolSize(10);
+    }
+
+    public static int poolSize() { return Async.pool.getPoolSize(); }
+    public static void poolSize(int size) { Async.pool.setPoolSize(size); }
 
     public static Future<?> async(Runnable task) {
-        return Async.queue.submit(task);
-    }
-
-    public static <T> Future<T> async(Runnable task, T result) {
-        return Async.queue.submit(task, result);
-    }
-
-    public static <T> Future<T> async(Callable<T> task) {
-        return Async.queue.submit(task);
-    }
-
-    public static Future<?> queue(Runnable task) {
-        return Async.queue.submit(task);
-    }
-
-    public static <T> Future<T> queue(Runnable task, T result) {
-        return Async.queue.submit(task, result);
-    }
-
-    public static <T> Future<T> queue(Callable<T> task) {
-        return Async.queue.submit(task);
-    }
-
-    public static Future<?> pool(Runnable task) {
         return Async.pool.submit(task);
     }
 
-    public static <T> Future<T> pool(Runnable task, T result) {
-        return Async.pool.submit(task, result);
-    }
-
-    public static <T> Future<T> pool(Callable<T> task) {
+    public static <T> Future<T> async(Callable<T> task) {
         return Async.pool.submit(task);
     }
 
     public static Future<?> delay(Runnable task, long delay) {
-        return Async.delay(task, null, delay);
+        return Async.pool.scheduleWithFixedDelay(task, delay);
     }
 
-    public static <T> Future<T> delay(Runnable task, T result, long delay) {
-        FutureTask<T> futureTask = new FutureTask<>(task, result);
-        Async.timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                futureTask.run();
-            }
-        }, delay);
-        return futureTask;
-    }
-
+    @SuppressWarnings("unchecked")
     public static <T> Future<T> delay(Callable<T> task, long delay) {
-        FutureTask<T> futureTask = new FutureTask<>(task);
-        Async.timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                futureTask.run();
-            }
-        }, delay);
-        return futureTask;
+        return (Future<T>) Async.pool.scheduleWithFixedDelay(new FutureTask<>(task), delay);
     }
 
     public static Future<?> delay(Runnable task, Date time) {
-        return Async.delay(task, null, time);
+        return Async.pool.scheduleWithFixedDelay(task, time, 0);
     }
 
-    public static <T> Future<T> delay(Runnable task, T result, Date time) {
-        FutureTask<T> futureTask = new FutureTask<>(task, result);
-        Async.timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                futureTask.run();
-            }
-        }, time);
-        return futureTask;
-    }
-
+    @SuppressWarnings("unchecked")
     public static <T> Future<T> delay(Callable<T> task, Date time) {
-        FutureTask<T> futureTask = new FutureTask<>(task);
-        Async.timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                futureTask.run();
-            }
-        }, time);
-        return futureTask;
+        return (Future<T>) Async.pool.scheduleWithFixedDelay(new FutureTask<>(task), time, 0);
     }
 
-    public static void loop(Runnable task, long period) {
-        Async.loop(task, 0, period);
+    public static Future<?> loop(Runnable task, long period) {
+        return Async.loop(task, 0, period);
     }
 
-    public static void loop(Runnable task, long delay, long period) {
-        Async.timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                task.run();
-            }
-        }, delay, period);
+    public static Future<?> loop(Runnable task, long delay, long period) {
+        return Async.pool.scheduleAtFixedRate(task, new Date(System.currentTimeMillis() + delay), period);
     }
 
-    public static void loop(Callable<?> task, long period) {
-        Async.loop(task, 0, period);
+    public static <T> Future<T> loop(Callable<T> task, long period) {
+        return Async.loop(task, 0, period);
     }
 
-    public static void loop(Callable<?> task, long delay, long period) {
-        Async.timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try { task.call(); }
-                catch (Exception e) { e.printStackTrace(); }
-            }
-        }, delay, period);
+    @SuppressWarnings("unchecked")
+    public static <T> Future<T> loop(Callable<T> task, long delay, long period) {
+        return (Future<T>) Async.pool.scheduleAtFixedRate(new FutureTask<>(task), new Date(System.currentTimeMillis() + delay), period);
     }
 
-    public static void loop(Runnable task, Date time, long period) {
-        Async.timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                task.run();
-            }
-        }, time, period);
+    public static Future<?> loop(Runnable task, String cron) {
+        return Async.pool.schedule(task, new CronTrigger(cron));
     }
 
-    public static void loop(Callable<?> task, Date time, long period) {
-        Async.timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try { task.call(); }
-                catch (Exception e) { e.printStackTrace(); }
-            }
-        }, time, period);
+    @SuppressWarnings("unchecked")
+    public static <T> Future<T> loop(Callable<T> task, String cron) {
+        return (Future<T>) Async.pool.schedule(new FutureTask<>(task), new CronTrigger(cron));
     }
 
 }

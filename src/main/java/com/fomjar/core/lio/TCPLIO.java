@@ -21,7 +21,7 @@ public class TCPLIO extends LIO {
         this.is = this.so.getInputStream();
         this.os = this.so.getOutputStream();
         this.buf = new byte[1024 * 4];
-        Async.pool(() -> {
+        Async.async(() -> {
             try {
                 while (this.isOpen()) {
                     int len = this.is.read(this.buf);

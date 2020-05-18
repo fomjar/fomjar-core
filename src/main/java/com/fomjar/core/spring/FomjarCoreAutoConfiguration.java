@@ -6,7 +6,6 @@ import com.fomjar.core.anno.AnnoScanAdapter;
 import com.fomjar.core.anno.AnnoScanFilter;
 import com.fomjar.core.async.Async;
 import com.fomjar.core.async.EventQueue;
-import com.fomjar.core.async.QueuedExecutor;
 import com.fomjar.core.async.SimpleThreadFactory;
 import com.fomjar.core.data.Struct;
 import com.fomjar.core.dist.Dist;
@@ -35,6 +34,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -80,30 +80,12 @@ public class FomjarCoreAutoConfiguration {
 
     @Bean
     @Lazy
-    public ExecutorService queue() {
-        return QueuedExecutor.main;
-    }
+    public ThreadPoolTaskScheduler pool() throws NoSuchFieldException, IllegalAccessException {
+        String size = Props.get(prefix + ".pool.size");
+        if (null != size && 0 < size.length())
+            Async.poolSize(Integer.parseInt(size));
 
-    @Bean
-    @Lazy
-    public ExecutorService pool() throws NoSuchFieldException, IllegalAccessException {
-        synchronized (Async.class) {
-            ExecutorService pool = Struct.get(Async.class, ExecutorService.class, "pool");
-            if (null != pool) return pool;
-
-            pool = Executors.newScheduledThreadPool(
-                    ifnull(Props.get(prefix + ".pool.size"), 10),
-                    new SimpleThreadFactory("main-pool"));
-            Struct.setFinalObject(Async.class, "pool", pool);
-
-            return pool;
-        }
-    }
-
-    @Bean
-    @Lazy
-    public Timer timer() throws NoSuchFieldException, IllegalAccessException {
-        return Struct.get(Async.class, Timer.class, "timer");
+        return Struct.get(Async.class, ThreadPoolTaskScheduler.class, "pool");
     }
 
     @Bean

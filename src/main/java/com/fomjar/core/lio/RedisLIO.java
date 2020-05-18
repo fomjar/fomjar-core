@@ -27,7 +27,7 @@ public class RedisLIO extends LIO {
         this.isOpen         = true;
         this.buf            = new byte[1024 * 4];
 
-        Async.pool(() -> {
+        Async.async(() -> {
             try {
                 while (this.isOpen()) {
                     int len = this.inputStream.read(this.buf);

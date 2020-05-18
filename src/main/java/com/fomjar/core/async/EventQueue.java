@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -19,34 +18,21 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class EventQueue {
 
-    private static final AtomicLong ID = new AtomicLong(0);
+    public static final EventQueue main = new EventQueue();
 
-    /**
-     * 主事件队列。
-     */
-    public static final EventQueue main = new EventQueue("main-event-queue");
+    private static final AtomicLong ID = new AtomicLong(0);
 
     private Map<String, List<EventListener<?>>> listeners;
     private ReadWriteLock   lock;
-    private ExecutorService executor;
 
     public EventQueue() {
-        this("event-queue-" + EventQueue.ID.getAndIncrement());
-    }
-
-    public EventQueue(String name) {
-        this(new QueuedExecutor(name));
-    }
-
-    public EventQueue(ExecutorService executor) {
         this.listeners  = new HashMap<>();
         this.lock       = new ReentrantReadWriteLock(true);
-        this.executor   = executor;
     }
 
     @SuppressWarnings("unchecked")
     public <T> void pub(String event, T data) {
-        this.executor.submit(() -> {
+        Async.async(() -> {
             Lock lock = this.lock.readLock();
             try {
                 lock.lock();
@@ -70,10 +56,6 @@ public class EventQueue {
         } finally {
             lock.unlock();
         }
-    }
-
-    public void close() {
-        this.executor.shutdown();
     }
 
 }

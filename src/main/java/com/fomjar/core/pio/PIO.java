@@ -50,10 +50,10 @@ public class PIO {
         this.printer    = new PrintWriter(this.process.getOutputStream(), true);
         this.cmd = cmd;
 
-        Async.pool(new Worker(this.process,
+        Async.async(new Worker(this.process,
                 this.process.getInputStream(),
                 this.inputReaders));
-        Async.pool(new Worker(this.process,
+        Async.async(new Worker(this.process,
                 this.process.getErrorStream(),
                 this.errorReaders));
 

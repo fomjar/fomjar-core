@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.concurrent.ExecutorService;
@@ -16,12 +17,6 @@ public class TestAsyncSpring {
 
     @Autowired
     private EventQueue eventQueue;
-
-    @Autowired
-    private ExecutorService queue;
-
-    @Autowired
-    private ExecutorService pool;
 
     @Test
     public void testEventQueue() throws InterruptedException {
@@ -45,32 +40,6 @@ public class TestAsyncSpring {
             this.eventQueue.pub("ObjectEvent", null);
         }
 
-        Thread.sleep(1000L);
-    }
-
-    @Test
-    public void testQueue() throws InterruptedException {
-        for (int i = 0; i < 8; i++) {
-            final int n = i;
-            this.queue.submit(() -> {
-                try {Thread.sleep(100L);}
-                catch (InterruptedException e) {e.printStackTrace();}
-                System.out.println(Thread.currentThread().getName() + ": " + n);
-            });
-        }
-        this.queue.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-    }
-
-    @Test
-    public void testPool() throws InterruptedException {
-        for (int i = 0; i < 8; i++) {
-            final int n = i;
-            this.pool.submit(() -> {
-                try {Thread.sleep(100L);}
-                catch (InterruptedException e) {e.printStackTrace();}
-                System.out.println(Thread.currentThread().getName() + ": " + n);
-            });
-        }
         Thread.sleep(1000L);
     }
 
