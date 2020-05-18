@@ -42,6 +42,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -97,6 +98,12 @@ public class FomjarCoreAutoConfiguration {
 
             return pool;
         }
+    }
+
+    @Bean
+    @Lazy
+    public Timer timer() throws NoSuchFieldException, IllegalAccessException {
+        return Struct.get(Async.class, Timer.class, "timer");
     }
 
     @Bean

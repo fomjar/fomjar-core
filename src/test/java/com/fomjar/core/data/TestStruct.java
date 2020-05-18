@@ -50,14 +50,6 @@ public class TestStruct {
         String s = "12345";
         Struct.setFinalObject(s, "value", new char[] {'a', 'b', 'c', 'd', 'e'});
         System.out.println(s);
-
-        System.out.println("port="
-                +
-                Struct.get(
-                        Struct.allocateInstance(
-                                Struct.defineClass(
-                                        Files.readAllBytes(new File("target/test-classes/com/fomjar/core/lio/TestLIO.class").toPath())))
-                , "port"));
     }
 
 }

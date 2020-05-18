@@ -31,4 +31,15 @@ public class TestAsyncStatic {
         });
     }
 
+    @Test
+    public void testTimer() throws InterruptedException {
+        delay(() -> {
+            System.out.println(Thread.currentThread().getName() + ": " + System.currentTimeMillis());
+        }, 1000L);
+        loop(() -> {
+            System.out.println(Thread.currentThread().getName() + ": " + System.currentTimeMillis());
+        }, 1000, 500L);
+        Thread.sleep(5000L);
+    }
+
 }
