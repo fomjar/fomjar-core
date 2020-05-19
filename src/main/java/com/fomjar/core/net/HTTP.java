@@ -69,7 +69,7 @@ public class HTTP {
         return this;
     }
 
-    public HTTP params(String key, String... val) {
+    public HTTP param(String key, String... val) {
         if (!this.params.containsKey(key))
             this.params.put(key, new LinkedList<>());
 
