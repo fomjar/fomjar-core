@@ -17,6 +17,15 @@
 - *pio*: 进程IO包。操作系统进程的IO异步读写工具
 - *spring*: Spring支持包。框架的Spring启动器自动配置以及Spring相关工具集。动态获取Bean、动态获取配置项等
 
+## 依赖导入
+```xml
+<dependency>
+    <groupId>com.fomjar</groupId>
+    <artifactId>fomjar-core</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
 ## DEMO
 
 ### algo(算法)

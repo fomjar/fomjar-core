@@ -25,9 +25,9 @@ public abstract class LIO {
     /**
      * 写入字符串。
      *
-     * @param string
-     * @return
-     * @throws IOException
+     * @param string 待写入的内容
+     * @return 此LIO对象
+     * @throws IOException 写入失败
      */
     public LIO write(String string) throws IOException {
         return this.write(string.getBytes());
@@ -36,9 +36,9 @@ public abstract class LIO {
     /**
      * 写入字节。
      *
-     * @param buf
-     * @return
-     * @throws IOException
+     * @param buf 待写入的内容
+     * @return 此LIO对象
+     * @throws IOException 写入失败
      */
     public LIO write(byte[] buf) throws IOException {
         return this.write(buf, 0, buf.length);
@@ -47,19 +47,19 @@ public abstract class LIO {
     /**
      * 写入字节。
      *
-     * @param buf
-     * @param off
-     * @param len
-     * @return
-     * @throws IOException
+     * @param buf 待写入的字节数组
+     * @param off 偏移位置
+     * @param len 字节长度
+     * @return 此LIO对象
+     * @throws IOException 写入失败
      */
     public abstract LIO write(byte[] buf, int off, int len) throws IOException;
 
     /**
      * 异步读取数据。
      *
-     * @param reader
-     * @return
+     * @param reader 异步读取回调对象
+     * @return 此LIO对象
      */
     public LIO read(LIOReader reader) {
         if (null != reader) this.readers.add(reader);
@@ -70,8 +70,8 @@ public abstract class LIO {
     /**
      * 获取附加的业务信息。
      *
-     * @param key
-     * @return
+     * @param key 键
+     * @return 值
      */
     public Object attach(String key) {
         if (null == this.attach) return null;
@@ -81,9 +81,9 @@ public abstract class LIO {
     /**
      * 附加业务信息。
      *
-     * @param key
-     * @param val
-     * @return
+     * @param key 键
+     * @param val 值
+     * @return 此LIO对象
      */
     public LIO attach(String key, Object val) {
         if (null == this.attach)
@@ -128,42 +128,42 @@ public abstract class LIO {
     /**
      * 判断此长连接是否为开启状态。
      *
-     * @return
+     * @return true为开启，false为关闭
      */
     public abstract boolean isOpen();
 
     /**
      * 关闭长连接。
      *
-     * @throws IOException
+     * @throws IOException 关闭失败
      */
     public abstract void close() throws IOException;
 
     /**
      * 本地主机名。
      *
-     * @return
+     * @return 主机名
      */
     public abstract String localHost();
 
     /**
      * 本地端口。
      *
-     * @return
+     * @return 端口号
      */
     public abstract int localPort();
 
     /**
      * 远端主机名。
      *
-     * @return
+     * @return 主机名
      */
     public abstract String remoteHost();
 
     /**
      * 远端端口。
      *
-     * @return
+     * @return 端口号
      */
     public abstract int remotePort();
 

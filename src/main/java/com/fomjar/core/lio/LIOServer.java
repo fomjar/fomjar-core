@@ -16,8 +16,8 @@ public abstract class LIOServer {
     /**
      * 在任意端口启动服务器。
      *
-     * @return
-     * @throws IOException
+     * @return 此LIO服务器对象
+     * @throws IOException 启动失败
      */
     public LIOServer startup() throws IOException {
         return this.startup(0);
@@ -26,31 +26,31 @@ public abstract class LIOServer {
     /**
      * 在指定端口启动服务器。
      *
-     * @param port
-     * @return
-     * @throws IOException
+     * @param port 端口号
+     * @return 此LIO服务器对象
+     * @throws IOException 启动失败
      */
     public abstract LIOServer startup(int port) throws IOException;
 
     /**
      * 停止服务器。
      *
-     * @return
+     * @return 此LIO服务器对象
      */
     public abstract LIOServer shutdown();
 
     /**
      * 获取服务器端口。
      *
-     * @return
+     * @return 服务端口号
      */
     public abstract int port();
 
     /**
      * 添加连接监听器。
      *
-     * @param listener
-     * @return
+     * @param listener 连接监听器
+     * @return 此LIO服务器对象
      */
     public LIOServer listen(LIOServerListener listener) {
         if (null != listener) this.listeners.add(listener);

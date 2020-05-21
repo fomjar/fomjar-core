@@ -22,19 +22,10 @@ public class RedisDist implements Dist {
                 .setPassword(pass)
                 .setDatabase(db);
         this.redissonClient = Redisson.create(config);
-
-        this.setup();
     }
 
     public RedisDist(RedissonClient redissonClient) {
         this.redissonClient = redissonClient;
-
-        this.setup();
-    }
-
-    private void setup() {
-        this.redissonNode = RedissonNode.create(new RedissonNodeConfig(this.redissonClient().getConfig()), this.redissonClient());
-        this.redissonNode().start();
     }
 
     public RedissonClient redissonClient() {
@@ -55,52 +46,50 @@ public class RedisDist implements Dist {
     }
 
     @Override
-    public void lock(Runnable task, String name, long lease, TimeUnit unit) throws Exception {
+    public void lock(Runnable task, String name, long hold, TimeUnit unit) {
         RLock lock = this.lock(name);
         try {
-            lock.lock(lease, unit);
-            try     {task.run();}
-            catch   (Exception e) {throw e;}
+            lock.lock(hold, unit);
+            task.run();
         } finally {
             lock.unlock();
         }
     }
 
     @Override
-    public <T> T lock(Callable<T> task, String name, long lease, TimeUnit unit) throws Exception {
+    public <T> T lock(Callable<T> task, String name, long hold, TimeUnit unit) {
         RLock lock = this.lock(name);
         try {
-            lock.lock(lease, unit);
+            lock.lock(hold, unit);
             try     {return task.call();}
-            catch   (Exception e) {throw e;}
+            catch   (Exception e) {throw new RuntimeException(e);}
         } finally {
             lock.unlock();
         }
     }
 
     @Override
-    public void lock(Runnable task, String name, long wait, long lease, TimeUnit unit) throws Exception {
+    public void lock(Runnable task, String name, long wait, long hold, TimeUnit unit) {
         RLock lock = this.lock(name);
         try {
-            if (lock.tryLock(wait, lease, unit)) {
-                try     {
-                    task.run();}
-                catch   (Exception e) {throw e;}
-            }
+            if (lock.tryLock(wait, hold, unit))
+                task.run();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
             lock.unlock();
         }
     }
 
     @Override
-    public <T> T lock(Callable<T> task, String name, long wait, long lease, TimeUnit unit) throws Exception {
+    public <T> T lock(Callable<T> task, String name, long wait, long hold, TimeUnit unit) {
         RLock lock = this.lock(name);
         try {
-            if (lock.tryLock(wait, lease, unit)) {
-                try     {return task.call();}
-                catch   (Exception e) {throw e;}
-            }
+            if (lock.tryLock(wait, hold, unit))
+                return task.call();
             return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             lock.unlock();
         }

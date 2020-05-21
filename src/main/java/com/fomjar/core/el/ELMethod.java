@@ -8,8 +8,9 @@ public interface ELMethod {
 
     /**
      * 方法执行体。
-     * @param args
-     * @return
+     * @param args 参数
+     * @return 返回值
+     * @throws Exception 执行失败
      */
     Object invoke(Object... args) throws Exception;
 

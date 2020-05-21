@@ -20,9 +20,9 @@ public abstract class Anno {
     /**
      * 扫描指定包下的注解。
      *
-     * @param pack
-     * @param reader
-     * @throws IOException
+     * @param pack 包路径
+     * @param reader 读取器
+     * @throws IOException 读取失败
      */
     public static void scan(String pack, AnnoScanReader reader) throws Exception {
         Anno.scan(Anno.class.getClassLoader(), pack, null, null, reader);
@@ -31,10 +31,10 @@ public abstract class Anno {
     /**
      * 扫描指定包下的注解。
      *
-     * @param loader
-     * @param pack
-     * @param reader
-     * @throws IOException
+     * @param loader 指定的类加载器
+     * @param pack 包路径
+     * @param reader 读取器
+     * @throws IOException 读取失败
      */
     public static void scan(ClassLoader loader, String pack, AnnoScanReader reader) throws Exception {
         Anno.scan(loader, pack, null, null, reader);
@@ -43,11 +43,11 @@ public abstract class Anno {
     /**
      * 扫描指定包下的注解。
      *
-     * @param pack
-     * @param structScanFilter
-     * @param annoScanFilter class-level filter
-     * @param reader
-     * @throws IOException
+     * @param pack 包路径
+     * @param structScanFilter 类过滤器
+     * @param annoScanFilter 注解过滤器
+     * @param reader 读取器
+     * @throws IOException 读取失败
      */
     public static void scan(String pack, StructScanFilter structScanFilter, AnnoScanFilter annoScanFilter, AnnoScanReader reader) throws Exception {
         Anno.scan(Anno.class.getClassLoader(), pack, structScanFilter, annoScanFilter, reader);
@@ -56,12 +56,12 @@ public abstract class Anno {
     /**
      * 扫描指定包下的注解。
      *
-     * @param loader
-     * @param pack
-     * @param structScanFilter
-     * @param annoScanFilter class-level filter
-     * @param reader
-     * @throws IOException
+     * @param loader 指定的类加载器
+     * @param pack 包路径
+     * @param structScanFilter 类过滤器
+     * @param annoScanFilter 注解过滤器
+     * @param reader 读取器
+     * @throws IOException 读取失败
      */
     public static void scan(ClassLoader loader, String pack, StructScanFilter structScanFilter, AnnoScanFilter annoScanFilter, AnnoScanReader reader) throws Exception {
         Struct.scan(loader, pack, structScanFilter, new StructScanReader() {
@@ -99,9 +99,9 @@ public abstract class Anno {
     /**
      * 从一组注解中任意取出一个满足指定类型的注解。未找到指定类型则返回null。
      *
-     * @param annotations
-     * @param types
-     * @return
+     * @param annotations 待查找的注解
+     * @param types 匹配类型
+     * @return 匹配到的注解
      */
     @SafeVarargs
     public static Annotation any(Annotation[] annotations, Class<? extends Annotation>... types) {

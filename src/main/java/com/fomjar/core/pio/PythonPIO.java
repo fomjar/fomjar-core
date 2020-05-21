@@ -14,8 +14,8 @@ public class PythonPIO extends PIO {
      * 为了方便地使用Python的标准输入输出，此处依赖pio.py脚本在命令模式下来传递和执行数据。
      * 对python交互模式的标准输入输出太复杂太难用的一种妥协。
      *
-     * @return
-     * @throws IOException
+     * @return Python进程关联的PIO对象
+     * @throws IOException 启动进程失败
      */
     public PythonPIO startup() throws IOException {
         super.startup("python", "-u", "pio.py");  // parameter "-u" to force script write it's output to stdout.
@@ -25,7 +25,7 @@ public class PythonPIO extends PIO {
     /**
      * 方便地导入依赖模块。导入后会自动reload以使自定义模块的代码修改实时生效。
      *
-     * @param mod
+     * @param mod 模块名
      */
     public void imp(String mod) {
         this.printer().printf("import %s", mod);

@@ -5,8 +5,7 @@ import com.fomjar.core.anno.Anno;
 import com.fomjar.core.anno.AnnoScanAdapter;
 import com.fomjar.core.anno.AnnoScanFilter;
 import com.fomjar.core.async.Async;
-import com.fomjar.core.async.EventQueue;
-import com.fomjar.core.async.SimpleThreadFactory;
+import com.fomjar.core.async.EventDispatcher;
 import com.fomjar.core.data.Struct;
 import com.fomjar.core.dist.Dist;
 import com.fomjar.core.dist.RedisDist;
@@ -42,9 +41,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Configuration
 public class FomjarCoreAutoConfiguration {
@@ -74,8 +70,8 @@ public class FomjarCoreAutoConfiguration {
 
     @Bean
     @Lazy
-    public EventQueue eventQueue() {
-        return EventQueue.main;
+    public EventDispatcher eventDispatcher() {
+        return EventDispatcher.main;
     }
 
     @Bean

@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 /**
- * 异步执行器汇总工具集。<br/>
+ * 异步执行器汇总工具集。<br>
  * 推荐用<code>
  *     import static com.fomjar.core.async.Async.*;
  * </code>

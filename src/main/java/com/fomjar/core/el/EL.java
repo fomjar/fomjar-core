@@ -13,8 +13,8 @@ public interface EL {
     /**
      * 在上下文中注册静态类，此操作会注册此静态类下的所有静态方法和静态常量。
      *
-     * @param clazz
-     * @return
+     * @param clazz 待注册类
+     * @return 此EL对象
      */
     default EL register(Class<?> clazz) {
         return this.register(clazz.getSimpleName(), clazz);
@@ -23,17 +23,17 @@ public interface EL {
     /**
      * 在上下文中注册静态类，此操作会注册此静态类下的所有静态方法和静态常量。
      *
-     * @param name
-     * @param clazz
-     * @return
+     * @param name 注册名称
+     * @param clazz 待注册待类
+     * @return 此EL对象
      */
     EL register(String name, Class<?> clazz);
 
     /**
      * 在上下文中注册静态方法。
      *
-     * @param method
-     * @return
+     * @param method 带注册的方法
+     * @return 此EL对象
      */
     default EL register(Method method) {
         return this.register(method.getName(), method);
@@ -42,27 +42,27 @@ public interface EL {
     /**
      * 在上下文中注册静态方法。
      *
-     * @param name
-     * @param method
-     * @return
+     * @param name 注册名称
+     * @param method 待注册的方法
+     * @return 此EL对象
      */
     EL register(String name, Method method);
 
     /**
      * 在上下文中注入自定义方法。
      *
-     * @param name
-     * @param method
-     * @return
+     * @param name 注册名称
+     * @param method 待注册的方法
+     * @return 此EL对象
      */
     EL register(String name, ELMethod method);
 
     /**
-     * 在上下文中注册一个对象。
+     * 在上下文中注册一个对象。可以是类、方法、或其他对象
      *
-     * @param name
-     * @param object
-     * @return
+     * @param name 注册名称
+     * @param object 待注册待对象
+     * @return 此EL对象
      */
     default EL register(String name, Object object) {
         if (object instanceof Class)    return this.register(name, (Class) object);
@@ -76,8 +76,8 @@ public interface EL {
     /**
      * 从上下文中撤销指定的注册对象。
      *
-     * @param names
-     * @return
+     * @param names 待撤销的对象名称
+     * @return 此EL对象
      */
     default EL deregister(String... names) {
         for (String name : names)
@@ -89,15 +89,15 @@ public interface EL {
     /**
      * 根据给定表达式求值。
      *
-     * @param exp
-     * @return
+     * @param exp 表达式
+     * @return 值串
      */
     String eval(String exp);
 
     /**
-     * 获取Context。
+     * 获取上下文执行环境。
      *
-     * @return
+     * @return 执行环境
      */
     Map<String, Object> context();
 

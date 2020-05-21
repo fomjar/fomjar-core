@@ -34,10 +34,11 @@ public class RedisMQ extends MQ {
     /**
      * 初始化RedisMQ配置。
      *
-     * @param host
-     * @param port
-     * @param pass
-     * @param db
+     * @param host Redis主机
+     * @param port Redis端口
+     * @param pass Redis密码
+     * @param db Redis库
+     * @return 此MQ对象
      */
     public RedisMQ setup(
             String  host,

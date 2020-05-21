@@ -16,15 +16,15 @@ public abstract class OSS {
     /**
      * 获取存储篮。
      *
-     * @return
+     * @return 名称
      */
     public String bucket() {return this.bucket;}
 
     /**
      * 设置存储篮。
      *
-     * @param bucket
-     * @return
+     * @param bucket 名称
+     * @return 此OSS对象
      */
     public OSS bucket(String bucket) {
         this.bucket = bucket;
@@ -34,9 +34,9 @@ public abstract class OSS {
     /**
      * 上传文件。
      *
-     * @param file
-     * @return
-     * @throws IOException
+     * @param file 待上传的文件
+     * @return 文件访问地址
+     * @throws IOException 上传失败
      */
     public String upload(MultipartFile file) throws IOException {
         return this.upload(file.getOriginalFilename(), file);
@@ -45,9 +45,10 @@ public abstract class OSS {
     /**
      * 上传文件。
      *
-     * @param file
-     * @return
-     * @throws IOException
+     * @param name 文件名
+     * @param file 待上传的文件
+     * @return 文件访问地址
+     * @throws IOException 上传失败
      */
     public String upload(String name, MultipartFile file) throws IOException {
         InputStream is = file.getInputStream();
@@ -59,9 +60,9 @@ public abstract class OSS {
     /**
      * 上传文件。
      *
-     * @param file
-     * @return
-     * @throws IOException
+     * @param file 待上传的文件
+     * @return 文件访问地址
+     * @throws IOException 上传失败
      */
     public String upload(File file) throws IOException {
         return this.upload(file.getName(), file);
@@ -71,10 +72,10 @@ public abstract class OSS {
     /**
      * 上传文件。
      *
-     * @param name
-     * @param file
-     * @return
-     * @throws IOException
+     * @param name 文件名
+     * @param file 待上传的文件
+     * @return 文件访问地址
+     * @throws IOException 上传失败
      */
     public String upload(String name, File file) throws IOException {
         InputStream is = new FileInputStream(file);
@@ -85,10 +86,10 @@ public abstract class OSS {
     /**
      * 上传文件。
      *
-     * @param name
-     * @param bytes
-     * @return
-     * @throws IOException
+     * @param name 文件名
+     * @param bytes 文件内容
+     * @return 文件访问地址
+     * @throws IOException 上传失败
      */
     public String upload(String name, byte[] bytes) throws IOException {
         return upload(name, new ByteArrayInputStream(bytes));
@@ -97,10 +98,10 @@ public abstract class OSS {
     /**
      * 上传文件。
      *
-     * @param name
-     * @param is
-     * @return
-     * @throws IOException
+     * @param name 文件名
+     * @param is 文件内容
+     * @return 文件访问地址
+     * @throws IOException 上传失败
      */
     public abstract String upload(String name, InputStream is) throws IOException;
 
@@ -112,8 +113,8 @@ public abstract class OSS {
     /**
      * 根据文件名推断其Content-Type属性。
      *
-     * @param file
-     * @return
+     * @param file 文件名
+     * @return mime值
      */
     public static String filename2contenttype(String file) {
         String defaultType = "application/octet-stream";

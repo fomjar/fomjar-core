@@ -39,12 +39,12 @@ public class AliyunMQ extends MQ {
     /**
      * 初始化AliyunMQ配置。
      *
-     * @param producerId
-     * @param consumerId
-     * @param accessKey
-     * @param secretKey
-     * @param onsAddr
-     * @return
+     * @param producerId 生产者ID
+     * @param consumerId 消费者ID
+     * @param accessKey AK
+     * @param secretKey SK
+     * @param onsAddr 服务地址
+     * @return 此MQ对象
      */
     public AliyunMQ setup(
             String producerId,

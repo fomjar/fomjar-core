@@ -37,9 +37,9 @@ public class PIO {
     /**
      * 根据给定命令启动此PIO。相关进程启动，相关IO线程挂载。
      *
-     * @param cmd
-     * @return
-     * @throws IOException
+     * @param cmd 待执行的命令
+     * @return 此命令启动的PIO对象
+     * @throws IOException 启动失败
      */
     public PIO startup(String... cmd) throws IOException {
         this.shutdown();
@@ -63,7 +63,7 @@ public class PIO {
     /**
      * 关闭此PIO。相关进程和IO线程资源会同步关闭释放。
      *
-     * @return
+     * @return 此PIO对象
      */
     public PIO shutdown() {
         if (null != this.process) {
@@ -79,7 +79,7 @@ public class PIO {
     /**
      * 获取此PIO的开启状态。
      *
-     * @return
+     * @return true为开启，false为关闭
      */
     public boolean isOpen() {return null != this.process && this.process.isAlive();}
 
@@ -87,7 +87,7 @@ public class PIO {
      * 等待进程结束。
      *
      * @return 返回码
-     * @throws InterruptedException
+     * @throws InterruptedException 等待结束过程中被中断
      */
     public int await() throws InterruptedException {
         return this.process.waitFor();
@@ -96,10 +96,10 @@ public class PIO {
     /**
      * 等待进程结束。
      *
-     * @param time
-     * @param unit
+     * @param time 时间
+     * @param unit 单位
      * @return true - 进程成功退出；false - 等待时间超时
-     * @throws InterruptedException
+     * @throws InterruptedException 等待被中断
      */
     public boolean await(long time, TimeUnit unit) throws InterruptedException {
         return this.process.waitFor(time, unit);
@@ -108,8 +108,8 @@ public class PIO {
     /**
      * 添加标准输出Reader。
      *
-     * @param reader
-     * @return
+     * @param reader 异步读取回调接口
+     * @return 此PIO对象
      */
     public PIO readInput(PIOReader reader) {
         if (null != reader) this.inputReaders.add(reader);
@@ -119,8 +119,8 @@ public class PIO {
     /**
      * 添加错误输出Reader。
      *
-     * @param reader
-     * @return
+     * @param reader 异步读取回调对象
+     * @return 此PIO对象
      */
     public PIO readError(PIOReader reader) {
         if (null != reader) this.errorReaders.add(reader);
@@ -130,7 +130,7 @@ public class PIO {
     /**
      * 打印器，用于写入数据。
      *
-     * @return
+     * @return 此PIO对象关联进程的写入打印器
      */
     public PrintWriter printer() {
         return this.printer;
@@ -139,14 +139,14 @@ public class PIO {
     /**
      * 获取当前正在运行的进程命令。
      *
-     * @return
+     * @return 命令数组
      */
     public String[] cmds() {return this.cmd;}
 
     /**
      * 获取进程ID。
      *
-     * @return
+     * @return 进程ID
      */
     public Integer pid() {
         if (null == this.pid && this.isOpen()) {
@@ -164,8 +164,8 @@ public class PIO {
     /**
      * 获取进程附加的业务内容。
      *
-     * @param key
-     * @return
+     * @param key 键
+     * @return 值
      */
     public Object attach(String key) {
         if (null == this.attach) return null;
@@ -175,9 +175,9 @@ public class PIO {
     /**
      * 向附加业务内容。
      *
-     * @param key
-     * @param val
-     * @return
+     * @param key 键
+     * @param val 值
+     * @return 此PIO对象
      */
     public PIO attach(String key, Object val) {
         if (null == this.attach)
