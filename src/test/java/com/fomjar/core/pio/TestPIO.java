@@ -1,15 +1,27 @@
 package com.fomjar.core.pio;
 
+import com.fomjar.core.io.BufferedStream;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 public class TestPIO {
 
     private static final Logger logger = LoggerFactory.getLogger(TestPIO.class);
+
+    @BeforeClass
+    public static void setup() throws IOException {
+        InputStream is = TestPIO.class.getResourceAsStream("/test.py");
+        new BufferedStream().write(is).writeTo(new File("test.py"));
+        is.close();
+
+    }
 
     @Test
     public void testPython() throws IOException, InterruptedException {

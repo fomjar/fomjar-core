@@ -1,17 +1,17 @@
 package com.fomjar.core.pio;
 
-import com.fomjar.core.data.BufferedChannel;
+import com.fomjar.core.io.BufferedStream;
 
 public abstract class PIOLineReader implements PIOReader {
 
-    private BufferedChannel channel;
+    private BufferedStream channel;
 
     public PIOLineReader() {
-        this.channel = new BufferedChannel();
+        this.channel = new BufferedStream();
     }
 
     public PIOLineReader(String charset) {
-        this.channel = new BufferedChannel(charset);
+        this.channel = new BufferedStream(charset);
     }
 
     @Override

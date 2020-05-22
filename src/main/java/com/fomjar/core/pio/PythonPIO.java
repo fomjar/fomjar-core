@@ -1,6 +1,10 @@
 package com.fomjar.core.pio;
 
+import com.fomjar.core.io.BufferedStream;
+
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Python的PIO实现。封装了一些方便python使用的方法。
@@ -8,6 +12,8 @@ import java.io.IOException;
  * @author fomjar
  */
 public class PythonPIO extends PIO {
+
+    private static final String SCRIPT = "pio.py";
 
     /**
      * 启动默认python解释器。基于当前系统的环境变量。
@@ -18,7 +24,13 @@ public class PythonPIO extends PIO {
      * @throws IOException 启动进程失败
      */
     public PythonPIO startup() throws IOException {
-        super.startup("python", "-u", "pio.py");  // parameter "-u" to force script write it's output to stdout.
+        File file = new File(PythonPIO.SCRIPT);
+        if (!file.isFile()) {
+            InputStream is = PythonPIO.class.getResourceAsStream("/" + PythonPIO.SCRIPT);
+            try { new BufferedStream().write(is).writeTo(file); }
+            finally { is.close(); }
+        }
+        super.startup("python", "-u", PythonPIO.SCRIPT);  // parameter "-u" to force script write it's output to stdout.
         return this;
     }
 

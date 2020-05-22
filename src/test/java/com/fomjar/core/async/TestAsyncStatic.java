@@ -9,14 +9,18 @@ import static com.fomjar.core.async.Async.*;
 public class TestAsyncStatic {
 
     @Test
-    public void testDelay() {
+    public void testAsync() {
         async(() -> {
-            System.out.println(Thread.currentThread().getName() + " : delay : " + System.currentTimeMillis());
+            System.out.println(Thread.currentThread().getName() + " : async : " + System.currentTimeMillis());
         });
         async(() -> {
-            System.out.println(Thread.currentThread().getName() + " : delay : " + System.currentTimeMillis());
+            System.out.println(Thread.currentThread().getName() + " : async : " + System.currentTimeMillis());
             return 0;
         });
+    }
+
+    @Test
+    public void testDelay() {
         delay(() -> {
             System.out.println(Thread.currentThread().getName() + " : delay : " + System.currentTimeMillis());
         }, 100);
@@ -43,14 +47,17 @@ public class TestAsyncStatic {
         f2.cancel(true);
         f3.cancel(true);
         Thread.sleep(2000L);
+        f1.cancel(true);
+        System.out.println("cancel: 1");
     }
 
     @Test
     public void testCron() throws InterruptedException {
-        loop(() -> {
+        Future<?> f = loop(() -> {
             System.out.println(Thread.currentThread().getName() + " : cron : " + System.currentTimeMillis());
         }, "0/2 * * * * ?");
         Thread.sleep(9000L);
+        f.cancel(true);
     }
 
 }

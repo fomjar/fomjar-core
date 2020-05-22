@@ -86,8 +86,7 @@ public abstract class MQ {
      * @return 此MQ对象
      */
     public MQ consume(String tag, MQTask task) {
-        if (!this.tasks.containsKey(tag)) this.tasks.put(tag, new LinkedList<>());
-
+        this.tasks.putIfAbsent(tag, new LinkedList<>());
         this.tasks.get(tag).add(task);
         return this;
     }

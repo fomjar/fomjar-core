@@ -41,6 +41,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 @Configuration
 public class FomjarCoreAutoConfiguration {
@@ -76,12 +77,14 @@ public class FomjarCoreAutoConfiguration {
 
     @Bean
     @Lazy
-    public ThreadPoolTaskScheduler pool() throws NoSuchFieldException, IllegalAccessException {
-        String size = Props.get(prefix + ".pool.size");
-        if (null != size && 0 < size.length())
-            Async.poolSize(Integer.parseInt(size));
+    public ExecutorService pool() throws NoSuchFieldException, IllegalAccessException {
+        return Struct.get(Async.class, ExecutorService.class, "pool");
+    }
 
-        return Struct.get(Async.class, ThreadPoolTaskScheduler.class, "pool");
+    @Bean
+    @Lazy
+    public ThreadPoolTaskScheduler scheduler() throws NoSuchFieldException, IllegalAccessException {
+        return Struct.get(Async.class, ThreadPoolTaskScheduler.class, "scheduler");
     }
 
     @Bean
@@ -177,13 +180,12 @@ public class FomjarCoreAutoConfiguration {
 
             @Override
             public void read(Annotation[] annotations, Class<?> clazz) throws Exception {
-                if (!this.controllers.containsKey(clazz.getSimpleName()))
-                    this.controllers.put(clazz.getSimpleName(), clazz.newInstance());
+                this.controllers.putIfAbsent(clazz.getName(), clazz.newInstance());
             }
 
             @Override
             public void read(Annotation[] annotations, Class<?> clazz, Method method) throws Exception {
-                Object controller = this.controllers.get(clazz.getSimpleName());
+                Object controller = this.controllers.get(clazz.getName());
                 if (null != Anno.any(annotations, LIORequest.class)) {
                     finalServer.listen(new LIOServerListener() {
                         @Override
@@ -220,7 +222,7 @@ public class FomjarCoreAutoConfiguration {
                         public void disconnect(LIO lio) {
                         }
                     });
-                    logger.info("LIO controller scanned: {}.{}()", clazz.getSimpleName(), method.getName());
+                    logger.info("LIO controller scanned: {}.{}()", clazz.getName(), method.getName());
                 }
                 if (null != Anno.any(annotations, LIOConnect.class)) {
                     finalServer.listen(new LIOServerListener() {

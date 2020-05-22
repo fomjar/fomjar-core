@@ -4,9 +4,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 
 import java.util.Date;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 
 /**
  * 异步执行器汇总工具集。<br>
@@ -17,15 +15,13 @@ import java.util.concurrent.FutureTask;
  */
 public abstract class Async {
 
-    private static final ThreadPoolTaskScheduler pool = new ThreadPoolTaskScheduler();
+    private static final ExecutorService            pool        = Executors.newCachedThreadPool(new SingleThreadFactory("main-pool"));
+    private static final ThreadPoolTaskScheduler    scheduler   = new ThreadPoolTaskScheduler();
     static {
-        Async.pool.setThreadFactory(new SimpleThreadFactory("main-pool"));
-        Async.pool.initialize();
-        Async.poolSize(10);
+        Async.scheduler.setThreadFactory(new SingleThreadFactory("main-scheduler"));
+        Async.scheduler.initialize();
+        Async.scheduler.setPoolSize(10);
     }
-
-    public static int poolSize() { return Async.pool.getPoolSize(); }
-    public static void poolSize(int size) { Async.pool.setPoolSize(size); }
 
     public static Future<?> async(Runnable task) {
         return Async.pool.submit(task);
@@ -36,47 +32,54 @@ public abstract class Async {
     }
 
     public static Future<?> delay(Runnable task, long delay) {
-        return Async.pool.scheduleWithFixedDelay(task, delay);
+        return Async.delay(task, new Date(System.currentTimeMillis() + delay));
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> Future<T> delay(Callable<T> task, long delay) {
-        return (Future<T>) Async.pool.scheduleWithFixedDelay(new FutureTask<>(task), delay);
+        return Async.delay(task, new Date(System.currentTimeMillis() + delay));
     }
 
     public static Future<?> delay(Runnable task, Date time) {
-        return Async.pool.scheduleWithFixedDelay(task, time, 0);
+        return Async.scheduler.schedule(task, time);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> Future<T> delay(Callable<T> task, Date time) {
-        return (Future<T>) Async.pool.scheduleWithFixedDelay(new FutureTask<>(task), time, 0);
+        return (Future<T>) Async.scheduler.schedule(new FutureTask<>(task), time);
     }
 
     public static Future<?> loop(Runnable task, long period) {
         return Async.loop(task, 0, period);
     }
 
-    public static Future<?> loop(Runnable task, long delay, long period) {
-        return Async.pool.scheduleAtFixedRate(task, new Date(System.currentTimeMillis() + delay), period);
-    }
-
     public static <T> Future<T> loop(Callable<T> task, long period) {
         return Async.loop(task, 0, period);
     }
 
-    @SuppressWarnings("unchecked")
+    public static Future<?> loop(Runnable task, long delay, long period) {
+        return Async.loop(task, new Date(System.currentTimeMillis() + delay), period);
+    }
+
     public static <T> Future<T> loop(Callable<T> task, long delay, long period) {
-        return (Future<T>) Async.pool.scheduleAtFixedRate(new FutureTask<>(task), new Date(System.currentTimeMillis() + delay), period);
+        return Async.loop(task, new Date(System.currentTimeMillis() + delay), period);
+    }
+
+    public static Future<?> loop(Runnable task, Date time, long period) {
+        return Async.scheduler.scheduleAtFixedRate(task, time, period);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Future<T> loop(Callable<T> task, Date time, long period) {
+        return (Future<T>) Async.scheduler.scheduleAtFixedRate(new FutureTask<>(task), time, period);
     }
 
     public static Future<?> loop(Runnable task, String cron) {
-        return Async.pool.schedule(task, new CronTrigger(cron));
+        return Async.scheduler.schedule(task, new CronTrigger(cron));
     }
 
     @SuppressWarnings("unchecked")
     public static <T> Future<T> loop(Callable<T> task, String cron) {
-        return (Future<T>) Async.pool.schedule(new FutureTask<>(task), new CronTrigger(cron));
+        return (Future<T>) Async.scheduler.schedule(new FutureTask<>(task), new CronTrigger(cron));
     }
 
 }

@@ -70,9 +70,7 @@ public class HTTP {
     }
 
     public HTTP param(String key, String... val) {
-        if (!this.params.containsKey(key))
-            this.params.put(key, new LinkedList<>());
-
+        this.params.putIfAbsent(key, new LinkedList<>());
         this.params.get(key).addAll(Arrays.asList(val));
         return this;
     }

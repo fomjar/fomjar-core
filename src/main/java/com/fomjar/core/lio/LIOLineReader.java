@@ -1,17 +1,17 @@
 package com.fomjar.core.lio;
 
-import com.fomjar.core.data.BufferedChannel;
+import com.fomjar.core.io.BufferedStream;
 
 public abstract class LIOLineReader implements LIOReader {
 
-    private BufferedChannel channel;
+    private BufferedStream channel;
 
     public LIOLineReader() {
-        this.channel = new BufferedChannel();
+        this.channel = new BufferedStream();
     }
 
     public LIOLineReader(String charset) {
-        this.channel = new BufferedChannel(charset);
+        this.channel = new BufferedStream(charset);
     }
 
     @Override
