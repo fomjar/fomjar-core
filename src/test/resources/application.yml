@@ -1,26 +1,25 @@
 fomjar:
-  core:
-#    el:
-#      type: aviator
-#      type: freemarker
-#    redis:
-#      host: 127.0.0.1
-#      port:
-#      pass:
-#      db:
-    mq:
-      topic: fomjar
-      group: core
-#    oss:
-#      type: minio
-#      type: aliyun
-#      ep:
-#      ak:
-#      sk:
-#      bucket:
-    lio:
-      package: com.fomjar.core
-#      type: websocket
-#      type: socket-io
-#      type: tcp
-#      port: 9001
+#  el:
+#    type: aviator
+#    type: freemarker
+#  redis:
+#    host: 127.0.0.1
+#    port:
+#    pass:
+#    db:
+  mq:
+    topic: fomjar
+    group: core
+#  oss:
+#    type: minio
+#    type: aliyun
+#    ep:
+#    ak:
+#    sk:
+#    bucket:
+  lio:
+    package: com.fomjar
+#    type: websocket
+#    type: socket-io
+#    type: tcp
+#    port: 9001

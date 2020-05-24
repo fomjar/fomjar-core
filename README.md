@@ -92,7 +92,7 @@ Anno.scan(new URLClassLoader(new URL[]{
 ### async(异步)
 异步工具库对异步执行操作做了优化，对系统整体性能有较好的提升。
 ```java
-import static com.fomjar.core.async.Async.*;
+
 
 // 异步执行
 async(() -> {
