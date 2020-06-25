@@ -24,63 +24,25 @@ public abstract class Async {
         return scheduler;
     }).call();
 
-    public static Future<?> async(Runnable task) {
+    public static     Future<?> async(Runnable    task) {
         return Async.pool.submit(task);
     }
-
     public static <T> Future<T> async(Callable<T> task) {
         return Async.pool.submit(task);
     }
 
-    public static Future<?> delay(Runnable task, long delay) {
-        return Async.delay(task, new Date(System.currentTimeMillis() + delay));
-    }
+    public static     Future<?> delay(Runnable    task, Date time ) { return Async.scheduler.schedule(task, time); }
+    public static <T> Future<T> delay(Callable<T> task, Date time ) { return Async.scheduler.getScheduledExecutor().schedule(task, time.getTime() - System.currentTimeMillis(), TimeUnit.MILLISECONDS); }
+    public static     Future<?> delay(Runnable    task, long delay) { return Async.delay(task, new Date(System.currentTimeMillis() + delay)); }
+    public static <T> Future<T> delay(Callable<T> task, long delay) { return Async.delay(task, new Date(System.currentTimeMillis() + delay)); }
 
-    public static <T> Future<T> delay(Callable<T> task, long delay) {
-        return Async.delay(task, new Date(System.currentTimeMillis() + delay));
-    }
-
-    public static Future<?> delay(Runnable task, Date time) {
-        return Async.scheduler.schedule(task, time);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Future<T> delay(Callable<T> task, Date time) {
-        return (Future<T>) Async.scheduler.schedule(new FutureTask<>(task), time);
-    }
-
-    public static Future<?> loop(Runnable task, long period) {
-        return Async.loop(task, 0, period);
-    }
-
-    public static <T> Future<T> loop(Callable<T> task, long period) {
-        return Async.loop(task, 0, period);
-    }
-
-    public static Future<?> loop(Runnable task, long delay, long period) {
-        return Async.loop(task, new Date(System.currentTimeMillis() + delay), period);
-    }
-
-    public static <T> Future<T> loop(Callable<T> task, long delay, long period) {
-        return Async.loop(task, new Date(System.currentTimeMillis() + delay), period);
-    }
-
-    public static Future<?> loop(Runnable task, Date time, long period) {
-        return Async.scheduler.scheduleAtFixedRate(task, time, period);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Future<T> loop(Callable<T> task, Date time, long period) {
-        return (Future<T>) Async.scheduler.scheduleAtFixedRate(new FutureTask<>(task), time, period);
-    }
-
-    public static Future<?> loop(Runnable task, String cron) {
-        return Async.scheduler.schedule(task, new CronTrigger(cron));
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Future<T> loop(Callable<T> task, String cron) {
-        return (Future<T>) Async.scheduler.schedule(new FutureTask<>(task), new CronTrigger(cron));
-    }
+    public static     Future<?> loop(Runnable    task, Date time,  long period) { return Async.scheduler.scheduleAtFixedRate(task, time, period); }
+    public static <T> Future<T> loop(Callable<T> task, Date time,  long period) { return (Future<T>) Async.loop(new FutureTask<>(task), time, period); }
+    public static     Future<?> loop(Runnable    task, long delay, long period) { return Async.loop(task, new Date(System.currentTimeMillis() + delay), period); }
+    public static <T> Future<T> loop(Callable<T> task, long delay, long period) { return Async.loop(task, new Date(System.currentTimeMillis() + delay), period); }
+    public static     Future<?> loop(Runnable    task,             long period) { return Async.loop(task, 0, period); }
+    public static <T> Future<T> loop(Callable<T> task,             long period) { return Async.loop(task, 0, period); }
+    public static     Future<?> loop(Runnable    task,             String cron) { return Async.scheduler.schedule(task, new CronTrigger(cron)); }
+    public static <T> Future<T> loop(Callable<T> task,             String cron) { return (Future<T>) Async.loop(new FutureTask<>(task), cron); }
 
 }
