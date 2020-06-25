@@ -1,7 +1,11 @@
 package com.fomjar.dist;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
+import com.fomjar.lang.Struct;
+
+import java.lang.management.ManagementFactory;
+import java.lang.reflect.InvocationTargetException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -12,106 +16,93 @@ import java.util.concurrent.TimeUnit;
 public interface Dist {
 
     /**
-     * 强制解锁。注意：此方法会解其他线程/进程加的锁。
+     * 当前JVM进程的PID。
+     *
+     * @return 当前进程ID
+     */
+    static long pid() {
+        String name = ManagementFactory.getRuntimeMXBean().getName();
+        String pid = name.substring(0, name.indexOf("@"));
+        return Long.parseLong(pid);
+    }
+
+    /**
+     * 统一进程ID。结合了 MAC地址、进程号 的唯一编号，用于在分布式场景下区分主机、进程。
+     *
+     * @return 统一进程编号
+     */
+    static String upid() {
+        StringBuilder sb = new StringBuilder();
+        byte[] mac = new byte[] {0, 0, 0, 0, 0, 0};
+        try { mac = Struct.call(NetworkInterface.class, NetworkInterface.class, "getDefault").getHardwareAddress(); }
+        catch (SocketException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
+        for (byte b : mac) sb.append(Integer.toHexString(b));
+
+        return sb.toString()
+                + "-"
+                + String.format("%08x", Dist.pid());
+    }
+
+    /**
+     * 统一线程ID。结合了 MAC地址、进程号、线程号 的唯一编号，用于在分布式场景下区分主机、进程、线程。
+     *
+     * @return 统一线程编号
+     */
+    static String utid() {
+        return Dist.upid()
+                + "-"
+                + String.format("%08x", Thread.currentThread().getId());
+    }
+
+    /**
+     * 选举。多实例同时竞选唯一的主实例，一般的运用场景包括：多实例部署但只需启动单个定时器、单个数据同步器、或者单个数据流处理进程等等。
+     *
+     * @param topic 选举事项
+     * @param election 选举回调。随着分布式系统的环境变化，在任意时间当选或落选时均会回调此接口
+     */
+    void elect(String topic, Election election);
+
+    /**
+     * 是否当选。
+     *
+     * @param topic 选举事项
+     * @return true为当选，false为落选
+     */
+    boolean isElected(String topic);
+
+    /**
+     * 弃权。退出选举。
+     * @param topic 弃权事项
+     */
+    void abstain(String topic);
+
+
+    /**
+     * 解锁。注意：此方法会解其他线程/进程加的锁。
      *
      * @param name 锁名
      */
     void unlock(String name);
 
-    /**
-     * 分布式锁。在锁内执行指定操作。此方法会一直阻塞直到获取锁为止，可以确保执行到方法体。
-     *
-     * @param task 待执行的任务
-     * @param name 锁名
-     * @param hold 锁定持续最长时间，一般设定远大于任务执行时长，任务提前结束将提前释放锁，单位毫秒
-     */
-    default void lock(Runnable task, String name, long hold) {
-        this.lock(task, name, hold, TimeUnit.MILLISECONDS);
+            boolean lock(String name, long wait, long hold, TimeUnit unit);
+    default void    lock(String name,            long hold, TimeUnit unit) {        this.lock(name, Integer.MAX_VALUE, hold, unit); }
+    default boolean lock(String name, long wait, long hold               ) { return this.lock(name, wait,              hold, TimeUnit.MILLISECONDS); }
+    default void    lock(String name,            long hold               ) {        this.lock(name, Integer.MAX_VALUE, hold, TimeUnit.MILLISECONDS); }
+
+    default boolean lock(Runnable task, String name, long wait, long hold, TimeUnit unit) {
+        boolean locked = false;
+        try {
+            if (locked = this.lock(name, wait, hold, unit))
+                if (null != task)
+                    task.run();
+        } finally {
+            if (locked)
+                this.unlock(name);
+        }
+        return locked;
     }
-
-    /**
-     * 分布式锁。在锁内执行指定操作。此方法会一直阻塞直到获取锁为止，可以确保执行到方法体。
-     *
-     * @param task 待执行的任务
-     * @param name 锁名
-     * @param hold 锁定持续最长时间，一般设定远大于任务执行时长，任务提前结束将提前释放锁
-     * @param unit 时间单位
-     */
-    void lock(Runnable task, String name, long hold, TimeUnit unit);
-
-    /**
-     * 分布式锁。在锁内执行指定操作。此方法会一直阻塞直到获取锁为止，可以确保执行到方法体。
-     *
-     * @param task 待执行的任务
-     * @param name 锁名
-     * @param hold 锁定持续最长时间，一般设定远大于任务执行时长，任务提前结束将提前释放锁，单位毫秒
-     * @param <T> 任务执行结果的返回类型
-     * @return 任务的执行结果
-     */
-    default <T> T lock(Callable<T> task, String name, long hold) {
-        return this.lock(task, name, hold, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * 分布式锁。在锁内执行指定操作。此方法会一直阻塞直到获取锁为止，可以确保执行到方法体。
-     *
-     * @param task 待执行的任务
-     * @param name 锁名
-     * @param hold 锁定持续最长时间，一般设定远大于任务执行时长，任务提前结束将提前释放锁
-     * @param unit 时间单位
-     * @param <T> 任务执行结果的返回类型
-     * @return 任务的执行结果
-     */
-    <T> T lock(Callable<T> task, String name, long hold, TimeUnit unit);
-
-    /**
-     * 分布式锁。在锁内执行指定操作。如果在指定等待时间内没有获取到锁，则不会执行方法体。
-     *
-     * @param task 待执行的任务
-     * @param name 锁名
-     * @param wait 等待获取锁的最长时间
-     * @param hold 锁定持续最长时间，一般设定远大于任务执行时长，任务提前结束将提前释放锁
-     */
-    default void lock(Runnable task, String name, long wait, long hold) {
-        this.lock(task, name, wait, hold, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * 分布式锁。在锁内执行指定操作。如果在指定等待时间内没有获取到锁，则不会执行方法体。
-     *
-     * @param task 待执行的任务
-     * @param name 锁名
-     * @param wait 等待获取锁的最长时间
-     * @param hold 锁定持续最长时间，一般设定远大于任务执行时长，任务提前结束将提前释放锁
-     * @param unit 时间单位
-     */
-    void lock(Runnable task, String name, long wait, long hold, TimeUnit unit);
-
-    /**
-     * 分布式锁。在锁内执行指定操作。如果在指定等待时间内没有获取到锁，则不会执行方法体。
-     *
-     * @param task 待执行的任务
-     * @param name 锁名
-     * @param wait 等待获取锁的最长时间
-     * @param hold 锁定持续最长时间，一般设定远大于任务执行时长，任务提前结束将提前释放锁
-     * @param <T> 任务执行结果的返回类型
-     * @return 任务的执行结果
-     */
-    default <T> T lock(Callable<T> task, String name, long wait, long hold) {
-        return this.lock(task, name, wait, hold, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * 分布式锁。在锁内执行指定操作。如果在指定等待时间内没有获取到锁，则不会执行方法体。
-     *
-     * @param task 待执行的任务
-     * @param name 锁名
-     * @param wait 等待获取锁的最长时间
-     * @param hold 锁定持续最长时间，一般设定远大于任务执行时长，任务提前结束将提前释放锁
-     * @param unit 时间单位
-     * @param <T> 任务执行结果的返回类型
-     * @return 任务的执行结果
-     */
-    <T> T lock(Callable<T> task, String name, long wait, long hold, TimeUnit unit);
+    default void    lock(Runnable task, String name,            long hold, TimeUnit unit) {        this.lock(task, name, Integer.MAX_VALUE, hold, unit); }
+    default boolean lock(Runnable task, String name, long wait, long hold               ) { return this.lock(task, name, wait,              hold, TimeUnit.MILLISECONDS); }
+    default void    lock(Runnable task, String name,            long hold               ) {        this.lock(task, name, Integer.MAX_VALUE, hold, TimeUnit.MILLISECONDS); }
 
 }

@@ -89,35 +89,38 @@ public class BufferedStream {
     }
 
     public String[] readLines() throws UnsupportedEncodingException {
-        List<String> lines = new LinkedList<>();
+        return this.readString(System.lineSeparator());
+    }
+
+    public String[] readString(String separator) throws UnsupportedEncodingException {
+        List<String> strings = new LinkedList<>();
         String string = this.readString();
 
-        // no lines
-        if (!string.contains(System.lineSeparator()))
+        // no separator
+        if (!string.contains(separator))
             return null;
 
-        // skip last incomplete line
-        boolean skipLast = !string.endsWith(System.lineSeparator());
+        // skip last incomplete string
+        boolean skipLast = !string.endsWith(separator);
 
-        String[] lines0 = string.split(System.lineSeparator());
-        for (int i = 0; i < lines0.length; i++) {
-            // skip last incomplete line
-            if (skipLast && i == lines0.length - 1)
+        String[] strings0 = string.split(separator);
+        for (int i = 0; i < strings0.length; i++) {
+            // skip last incomplete string
+            if (skipLast && i == strings0.length - 1)
                 break;
-            // read line
-            lines.add(lines0[i]);
+            // read string
+            strings.add(strings0[i]);
         }
 
         // keep last incomplete line
         if (skipLast) {
             this.write(
                     string.substring(
-                            string.lastIndexOf(System.lineSeparator())
-                                    + System.lineSeparator().length()
+                            string.lastIndexOf(separator) + separator.length()
                     ).getBytes(this.charset));
         }
 
-        return lines.toArray(new String[0]);
+        return strings.toArray(new String[0]);
     }
 
     public String readString() throws UnsupportedEncodingException {

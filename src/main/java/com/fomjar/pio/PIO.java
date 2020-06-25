@@ -1,11 +1,11 @@
 package com.fomjar.pio;
 
 import com.fomjar.lang.Async;
+import com.fomjar.lang.Struct;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,13 +23,14 @@ public class PIO {
     private List<PIOReader> errorReaders;
 
     private Process     process;
-    private String[] cmd;
-    private Integer     pid;
+    private String[]    cmd;
+    private int         pid;
     private PrintWriter printer;
 
     private Map<String, Object> attach;
 
     public PIO() {
+        this.pid = -1;
         this.inputReaders   = new LinkedList<>();
         this.errorReaders   = new LinkedList<>();
     }
@@ -69,8 +70,8 @@ public class PIO {
         if (null != this.process) {
             this.process.destroyForcibly();
             this.process    = null;
-            this.cmd = null;
-            this.pid        = null;
+            this.cmd        = null;
+            this.pid        = -1;
             this.printer    = null;
         }
         return this;
@@ -148,15 +149,10 @@ public class PIO {
      *
      * @return 进程ID
      */
-    public Integer pid() {
-        if (null == this.pid && this.isOpen()) {
-            try {
-                Field pid = Class.forName("java.lang.UNIXProcess").getDeclaredField("pid");
-                pid.setAccessible(true);
-                this.pid = pid.getInt(this.process);
-            } catch (NoSuchFieldException | ClassNotFoundException | IllegalAccessException e) {
-                throw new IllegalStateException(e);
-            }
+    public int pid() {
+        if (-1 == this.pid) {
+            try { this.pid = Struct.get(this.process, int.class, "pid"); }
+            catch (NoSuchFieldException | IllegalAccessException e) { throw new IllegalStateException(e); }
         }
         return this.pid;
     }
