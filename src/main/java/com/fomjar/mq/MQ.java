@@ -146,7 +146,6 @@ public abstract class MQ {
      * 实际的生产消息的方法由子类来实现。
      *
      * @param msg 待生产的消息
-     * @return 此MQ对象
      */
     protected abstract void doProduce(MQMsg msg);
 
