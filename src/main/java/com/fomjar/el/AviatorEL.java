@@ -1,11 +1,14 @@
 package com.fomjar.el;
 
+import com.fomjar.lang.Task;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.runtime.function.AbstractVariadicFunction;
 import com.googlecode.aviator.runtime.type.AviatorFunction;
 import com.googlecode.aviator.runtime.type.AviatorObject;
 import com.googlecode.aviator.runtime.type.AviatorRuntimeJavaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -15,6 +18,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class AviatorEL extends AbstractEL {
+
+    private static final Logger logger = LoggerFactory.getLogger(AviatorEL.class);
 
     private AviatorEvaluatorInstance aviator;
 
@@ -39,7 +44,7 @@ public class AviatorEL extends AbstractEL {
                 continue;
 
             try {vars.put(field.getName(), field.get(null));}
-            catch (IllegalAccessException e) {e.printStackTrace();}
+            catch (IllegalAccessException e) { logger.error("Access field({}) from class({}) failed.", field.getName(), clazz.getName(), e); }
         }
         this.register(name, vars);
 
@@ -82,8 +87,8 @@ public class AviatorEL extends AbstractEL {
         return new AbstractVariadicFunction() {
             @Override
             public AviatorObject variadicCall(Map<String, Object> env, AviatorObject... args) {
-                try {return AviatorRuntimeJavaType.valueOf(method.invoke(AviatorEL.this.decodeArgs(args)));}
-                catch (Exception e) {throw new IllegalArgumentException(e);}
+                try { return AviatorRuntimeJavaType.valueOf(method.invoke(AviatorEL.this.decodeArgs(args))); }
+                catch (Exception e) { throw new IllegalArgumentException(e); }
             }
             @Override
             public String getName() {

@@ -1,6 +1,6 @@
 package com.fomjar.pio;
 
-import com.fomjar.io.BufferedStream;
+import com.fomjar.io.BufferPool;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ public class TestPIO {
     @BeforeClass
     public static void setup() throws IOException {
         InputStream is = TestPIO.class.getResourceAsStream("/test.py");
-        new BufferedStream().write(is).writeTo(new File("test.py"));
+        new BufferPool().write(is).read(new File("test.py"));
         is.close();
 
     }
@@ -29,13 +29,13 @@ public class TestPIO {
         pio.startup()
                 .readInput(new PIOLineReader() {
                     @Override
-                    public void readLine(String line) throws Exception {
+                    public void readLine(String line) {
                         logger.info("[OUT] {}", line);
                     }
                 })
                 .readError(new PIOLineReader() {
                     @Override
-                    public void readLine(String line) throws Exception {
+                    public void readLine(String line) {
                         logger.info("[ERR] {}", line);
                     }
                 });
@@ -57,13 +57,13 @@ public class TestPIO {
         new PIO()
                 .readInput(new PIOLineReader() {
                     @Override
-                    public void readLine(String line) throws Exception {
+                    public void readLine(String line) {
                         logger.info("[OUT] {}", line);
                     }
                 })
                 .readError(new PIOLineReader() {
                     @Override
-                    public void readLine(String line) throws Exception {
+                    public void readLine(String line) {
                         logger.info("[ERR] {}", line);
                     }
                 })

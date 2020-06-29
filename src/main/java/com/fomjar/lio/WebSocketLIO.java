@@ -21,9 +21,7 @@ public class WebSocketLIO extends LIO {
             this.client = new WebSocketClient();
             this.client.start();
             this.client.connect(new WebSocketHandler(), uri);
-        } catch (Exception e) {
-            throw new IOException(e);
-        }
+        } catch (Exception e) { throw new IOException(e); }
     }
 
     WebSocketLIO(Session session) {

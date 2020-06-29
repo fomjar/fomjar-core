@@ -1,6 +1,7 @@
 package com.fomjar.dist;
 
 import com.fomjar.lang.Struct;
+import com.fomjar.lang.Task;
 
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
@@ -33,9 +34,9 @@ public interface Dist {
      */
     static String upid() {
         StringBuilder sb = new StringBuilder();
-        byte[] mac = new byte[] {0, 0, 0, 0, 0, 0};
-        try { mac = Struct.call(NetworkInterface.class, NetworkInterface.class, "getDefault").getHardwareAddress(); }
-        catch (SocketException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
+        byte[] mac = Task.catchdo(() ->
+                Struct.call(NetworkInterface.class, NetworkInterface.class, "getDefault").getHardwareAddress(),
+                new byte[] {0, 0, 0, 0, 0, 0});
         for (byte b : mac) sb.append(Integer.toHexString(b));
 
         return sb.toString()

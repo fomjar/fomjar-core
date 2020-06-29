@@ -19,42 +19,25 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  * @author fomjar
  */
-public class Event {
-
-    /**
-     * 事件监听器。
-     *
-     * @param <T> 事件数据的类型
-     */
-    public interface Listener<T> {
-
-        /**
-         * 接受事件的回调方法。
-         *
-         * @param event 事件名称
-         * @param data 事件数据
-         */
-        void on(String event, T data);
-
-    }
+public class EventDispatcher {
 
     /**
      * 主事件分发器。
      */
-    public static final Event main = new Event("event-dispatcher");
+    public static final EventDispatcher main = new EventDispatcher("event-dispatcher");
 
-    private static final Logger logger = LoggerFactory.getLogger(Event.class);
+    private static final Logger logger = LoggerFactory.getLogger(EventDispatcher.class);
     private static final AtomicLong ID = new AtomicLong(0);
 
-    private Map<String, List<Listener<?>>> listeners;
+    private Map<String, List<EventListener<?>>> listeners;
     private ReadWriteLock   lock;
     private ExecutorService queue;
 
-    public Event() {
-        this("event-dispatcher-" + Event.ID.getAndIncrement());
+    public EventDispatcher() {
+        this("event-dispatcher-" + EventDispatcher.ID.getAndIncrement());
     }
 
-    public Event(String name) {
+    public EventDispatcher(String name) {
         this.listeners  = new HashMap<>();
         this.lock       = new ReentrantReadWriteLock(true);
         this.queue      = Executors.newSingleThreadExecutor(new SingleThreadFactory(name));
@@ -72,22 +55,19 @@ public class Event {
                 lock.lock();
                 logger.info("[EVENT] - {}", event);
                 if (!this.listeners.containsKey(event)) return;
-                this.listeners.get(event).forEach(listener -> {
-                    try {((Listener<T>) listener).on(event, data);}
-                    catch (Exception e) {e.printStackTrace();}
-                });
+                this.listeners.get(event).forEach(listener -> Task.catchdo(() -> ((EventListener<T>) listener).on(event, data)));
             } finally {
                 lock.unlock();
             }
         });
     }
 
-    public void sub(String event, Listener<?> listener) {
+    public void sub(String event, EventListener<?> eventListener) {
         Lock lock = this.lock.writeLock();
         try {
             lock.lock();
             this.listeners.putIfAbsent(event, new LinkedList<>());
-            this.listeners.get(event).add(listener);
+            this.listeners.get(event).add(eventListener);
         } finally {
             lock.unlock();
         }

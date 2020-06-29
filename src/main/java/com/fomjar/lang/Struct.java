@@ -1,5 +1,7 @@
 package com.fomjar.lang;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.Resource;
@@ -21,6 +23,8 @@ import java.util.function.IntFunction;
  * @author fomjar
  */
 public abstract class Struct {
+
+    private static final Logger logger = LoggerFactory.getLogger(Struct.class);
 
     /**
      * 获取类内部定义的指定成员字段。范围包括各类访问权限及各级父类定义的。
@@ -178,9 +182,8 @@ public abstract class Struct {
      */
     public static Unsafe unsafe = null;
     static {
-        try {
-            Struct.unsafe = Struct.get(Unsafe.class, Unsafe.class, "theUnsafe");}
-        catch (NoSuchFieldException | IllegalAccessException e) {e.printStackTrace();}
+        try { Struct.unsafe = Struct.get(Unsafe.class, Unsafe.class, "theUnsafe");}
+        catch (NoSuchFieldException | IllegalAccessException e) { logger.warn("Setup the \"Unsafe\" failed.", e); }
     }
 
     /**

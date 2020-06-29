@@ -30,11 +30,11 @@ public class IncrementThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r) {
-        return ((Func<Thread>) (args) -> {
+        return Task.catchdo(() -> {
             Thread t =  new Thread(r, this.prefix + "-" + this.id.getAndIncrement());
             t.setDaemon(true);
             return t;
-        }).call();
+        });
     }
 
 }

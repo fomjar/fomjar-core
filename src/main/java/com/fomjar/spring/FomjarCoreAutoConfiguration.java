@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.fomjar.lang.Anno;
 import com.fomjar.lang.AnnoScanAdapter;
 import com.fomjar.lang.AnnoScanFilter;
-import com.fomjar.lang.Async;
-import com.fomjar.lang.Event;
+import com.fomjar.lang.Task;
+import com.fomjar.lang.EventDispatcher;
 import com.fomjar.lang.Struct;
 import com.fomjar.dist.Dist;
 import com.fomjar.dist.RedisDist;
@@ -71,20 +71,20 @@ public class FomjarCoreAutoConfiguration {
 
     @Bean
     @Lazy
-    public Event event() {
-        return Event.main;
+    public EventDispatcher eventDispatcher() {
+        return EventDispatcher.main;
     }
 
     @Bean
     @Lazy
     public ExecutorService pool() throws NoSuchFieldException, IllegalAccessException {
-        return Struct.get(Async.class, ExecutorService.class, "pool");
+        return Struct.get(Task.class, ExecutorService.class, "pool");
     }
 
     @Bean
     @Lazy
     public ThreadPoolTaskScheduler scheduler() throws NoSuchFieldException, IllegalAccessException {
-        return Struct.get(Async.class, ThreadPoolTaskScheduler.class, "scheduler");
+        return Struct.get(Task.class, ThreadPoolTaskScheduler.class, "scheduler");
     }
 
     @Bean
@@ -207,14 +207,17 @@ public class FomjarCoreAutoConfiguration {
                                         parameters[i] = JSONObject.parseObject(new String(buf, off, len));
                                     }
                                 }
-                                Object result = method.invoke(controller, parameters);
-                                if (null == result) {
-                                    // Nothing to do.
-                                } else if (result instanceof byte[]) {
-                                    lio.write((byte[]) result);
-                                } else {
-                                    lio.write(result.toString());
-                                }
+                                Task.catchdo(() -> {
+                                    Object result = method.invoke(controller, parameters);
+                                    if (null == result) {
+                                        // Nothing to do.
+                                    } else if (result instanceof byte[]) {
+                                        lio.write((byte[]) result);
+                                    } else {
+                                        lio.write(result.toString());
+                                    }
+                                    return 0;
+                                });
                             });
                         }
 
@@ -227,14 +230,14 @@ public class FomjarCoreAutoConfiguration {
                 if (null != Anno.any(annotations, LIOConnect.class)) {
                     finalServer.listen(new LIOServerListener() {
                         @Override
-                        public void connect(LIO lio) throws InvocationTargetException, IllegalAccessException {
+                        public void connect(LIO lio) {
                             Object[] parameters = new Object[method.getParameterCount()];
                             for (int i = 0; i < method.getParameterTypes().length; i++) {
                                 if (LIO.class.isAssignableFrom(method.getParameterTypes()[i])) {
                                     parameters[i] = lio;
                                 }
                             }
-                            method.invoke(controller, parameters);
+                            Task.catchdo(() -> method.invoke(controller, parameters));
                         }
 
                         @Override
@@ -250,14 +253,14 @@ public class FomjarCoreAutoConfiguration {
                         }
 
                         @Override
-                        public void disconnect(LIO lio) throws InvocationTargetException, IllegalAccessException {
+                        public void disconnect(LIO lio) {
                             Object[] parameters = new Object[method.getParameterCount()];
                             for (int i = 0; i < method.getParameterTypes().length; i++) {
                                 if (LIO.class.isAssignableFrom(method.getParameterTypes()[i])) {
                                     parameters[i] = lio;
                                 }
                             }
-                            method.invoke(controller, parameters);
+                            Task.catchdo(() -> method.invoke(controller, parameters));
                         }
                     });
                 }

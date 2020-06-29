@@ -1,12 +1,16 @@
 package com.fomjar.lio;
 
-import com.fomjar.lang.Async;
+import com.fomjar.lang.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class TCPLIOServer extends LIOServer {
+
+    private static final Logger logger = LoggerFactory.getLogger(TCPLIOServer.class);
 
     private ServerSocket server;
 
@@ -15,7 +19,7 @@ public class TCPLIOServer extends LIOServer {
         this.shutdown();
 
         this.server = new ServerSocket(port);
-        Async.async(() -> {
+        Task.async(() -> {
             while (!this.server.isClosed()) {
                 try {
                     Socket socket = this.server.accept();
@@ -35,7 +39,7 @@ public class TCPLIOServer extends LIOServer {
     public LIOServer shutdown() {
         if (null != this.server) {
             try {this.server.close();}
-            catch (IOException e) {e.printStackTrace();}
+            catch (IOException e) { logger.warn("Shutdown server failed.", e); }
         }
         return this;
     }

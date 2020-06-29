@@ -1,5 +1,9 @@
 package com.fomjar.lio;
 
+import com.fomjar.lang.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +14,8 @@ import java.util.List;
  * @author fomjar
  */
 public abstract class LIOServer {
+
+    private static final Logger logger = LoggerFactory.getLogger(LIOServer.class);
 
     private List<LIOServerListener> listeners = new LinkedList<>();
 
@@ -63,10 +69,8 @@ public abstract class LIOServer {
      * @param lio
      */
     void doConnect(LIO lio) {
-        for (LIOServerListener listener : this.listeners) {
-            try {listener.connect(lio);}
-            catch (Exception e) {e.printStackTrace();}
-        }
+        for (LIOServerListener listener : this.listeners)
+            Task.catchdo(() -> listener.connect(lio));
     }
 
     /**
@@ -75,10 +79,8 @@ public abstract class LIOServer {
      * @param lio
      */
     void doDisconnect(LIO lio) {
-        for (LIOServerListener listener : this.listeners) {
-            try {listener.disconnect(lio);}
-            catch (Exception e) {e.printStackTrace();}
-        }
+        for (LIOServerListener listener : this.listeners)
+            Task.catchdo(() -> listener.disconnect(lio));
     }
 
 }

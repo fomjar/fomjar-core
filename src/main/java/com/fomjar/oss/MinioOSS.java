@@ -1,12 +1,12 @@
 package com.fomjar.oss;
 
-import com.fomjar.lang.Func;
-import com.fomjar.lang.Struct;
+import com.fomjar.lang.Task;
 import io.minio.MinioClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,12 +18,14 @@ import java.util.Map;
  */
 public class MinioOSS extends OSS {
 
+    private static final Logger logger = LoggerFactory.getLogger(MinioOSS.class);
+
     private MinioClient client;
 
     public MinioOSS setup(String endPoint, String accessKey, String secretKey) {
         this.shutdown();
         try {this.client = new MinioClient(endPoint, accessKey, secretKey);}
-        catch (Exception e) {throw new IllegalArgumentException(e);}
+        catch (Exception e) { throw new IllegalArgumentException(e); }
         return this;
     }
 
@@ -40,12 +42,11 @@ public class MinioOSS extends OSS {
                     name,
                     is,
                     null,
-                    ((Func<Map<String, String>>) (args) -> {
+                    Task.catchdo(() -> {
                         Map<String, String> map = new HashMap<>();
-                        try { map.put("Content-Disposition", String.format("attachment; filename*=utf-8''%s", URLEncoder.encode(name, "utf-8"))); }
-                        catch (UnsupportedEncodingException e) { e.printStackTrace(); }
+                        map.put("Content-Disposition", String.format("attachment; filename*=utf-8''%s", URLEncoder.encode(name, "utf-8")));
                         return map;
-                    }).call(),
+                    }),
                     null,
                     filename2contenttype(name));
             return this.client.getObjectUrl(this.bucket(), name);

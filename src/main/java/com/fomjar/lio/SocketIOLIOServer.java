@@ -2,12 +2,16 @@ package com.fomjar.lio;
 
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SocketIOLIOServer extends LIOServer {
+
+    private static final Logger logger = LoggerFactory.getLogger(SocketIOLIOServer.class);
 
     private Map<String, LIO> lios;
     private Configuration config;
@@ -35,15 +39,13 @@ public class SocketIOLIOServer extends LIOServer {
                 LIO lio = new SocketIOLIO(client);
                 this.lios.put(client.getSessionId().toString(), lio);
                 this.doConnect(lio);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            } catch (IOException e) { logger.error("Accept client({}) failed.", client.getRemoteAddress().toString(), e); }
         });
         this.server.addDisconnectListener(client -> {
             LIO lio = this.lios.remove(client.getSessionId().toString());
             this.doDisconnect(lio);
             try { lio.close(); }
-            catch (IOException e) { e.printStackTrace(); }
+            catch (IOException e) { logger.warn("Close client({}) failed.", client.getRemoteAddress().toString(), e); }
         });
         this.server.addEventListener(LIO.class.getSimpleName(), byte[].class,
                 (client, data, ackRequest)

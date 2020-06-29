@@ -7,6 +7,6 @@ package com.fomjar.pio;
  */
 public interface PIOReader {
 
-    void read(byte[] buf, int off, int len) throws Exception;
+    void read(byte[] buf, int off, int len);
 
 }

@@ -98,9 +98,8 @@ public class AliyunMQ extends MQ {
     }
 
     @Override
-    protected MQ doProduce(MQMsg msg) {
+    protected void doProduce(MQMsg msg) {
         this.producer.send(new Message(this.topic(), msg.tag(), msg.transaction(), msg.toString().getBytes()), getClass().getName());
-        return this;
     }
 
     @Override

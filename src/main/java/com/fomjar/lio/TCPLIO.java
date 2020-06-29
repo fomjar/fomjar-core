@@ -1,6 +1,8 @@
 package com.fomjar.lio;
 
-import com.fomjar.lang.Async;
+import com.fomjar.lang.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +10,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 public class TCPLIO extends LIO {
+
+    private static final Logger logger = LoggerFactory.getLogger(TCPLIO.class);
 
     LIOServer server;
     private Socket          so;
@@ -21,7 +25,7 @@ public class TCPLIO extends LIO {
         this.is = this.so.getInputStream();
         this.os = this.so.getOutputStream();
         this.buf = new byte[1024 * 4];
-        Async.async(() -> {
+        Task.async(() -> {
             try {
                 while (this.isOpen()) {
                     int len = this.is.read(this.buf);
@@ -34,7 +38,7 @@ public class TCPLIO extends LIO {
                     this.server.doDisconnect(this);
             } finally {
                 try {this.close();}
-                catch (IOException e) {e.printStackTrace();}
+                catch (IOException e) { logger.warn("Close connection failed.", e); }
             }
         });
     }

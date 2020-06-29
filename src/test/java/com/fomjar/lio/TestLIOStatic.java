@@ -17,7 +17,7 @@ public class TestLIOStatic {
             public void connect(LIO lio) {
                 lio.read(new LIOLineReader() {
                     @Override
-                    public void readLine(String line) throws Exception {
+                    public void readLine(String line) {
                         System.out.println("from client: " + line);
                     }
                 });

@@ -1,30 +1,34 @@
 package com.fomjar.pio;
 
-import com.fomjar.io.BufferedStream;
+import com.fomjar.io.BufferPool;
+import com.fomjar.lang.Task;
 
 public abstract class PIOLineReader implements PIOReader {
 
-    private BufferedStream channel;
+    private BufferPool buffer;
 
     public PIOLineReader() {
-        this.channel = new BufferedStream();
+        this.buffer = new BufferPool();
     }
 
     public PIOLineReader(String charset) {
-        this.channel = new BufferedStream(charset);
+        this.buffer = new BufferPool(charset);
     }
 
     @Override
-    public void read(byte[] buf, int off, int len) throws Exception {
-        this.channel.write(buf, off, len);
-        String[] lines = this.channel.readLines();
-        if (null != lines) {
-            for (String line : lines) {
-                this.readLine(line);
+    public void read(byte[] buf, int off, int len) {
+        Task.catchdo(() -> {
+            this.buffer.write(buf, off, len);
+            String[] lines = this.buffer.readLines();
+            if (null != lines) {
+                for (String line : lines) {
+                    this.readLine(line);
+                }
             }
-        }
+            return 0;
+        });
     }
 
-    public abstract void readLine(String line) throws Exception;
+    public abstract void readLine(String line);
 
 }

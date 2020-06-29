@@ -1,6 +1,6 @@
 package com.fomjar.pio;
 
-import com.fomjar.lang.Async;
+import com.fomjar.lang.Task;
 import com.fomjar.lang.Struct;
 
 import java.io.IOException;
@@ -51,10 +51,10 @@ public class PIO {
         this.printer    = new PrintWriter(this.process.getOutputStream(), true);
         this.cmd = cmd;
 
-        Async.async(new Worker(this.process,
+        Task.async(new Worker(this.process,
                 this.process.getInputStream(),
                 this.inputReaders));
-        Async.async(new Worker(this.process,
+        Task.async(new Worker(this.process,
                 this.process.getErrorStream(),
                 this.errorReaders));
 
@@ -201,10 +201,9 @@ public class PIO {
             while (null != this.process && this.process.isAlive()) {
                 try {
                     if (0 < (len = this.reader.read(buf))) {
-                        for (PIOReader reader : this.readers) {
-                            try {reader.read(buf, 0, len);}
-                            catch (Exception e) {e.printStackTrace();}
-                        }
+                        int finalLen = len;
+                        for (PIOReader reader : this.readers)
+                            Task.catchdo(() -> reader.read(buf, 0, finalLen));
                     }
                 } catch (IOException e) {
                     // maybe process is killed, no need to print stack.

@@ -2,6 +2,7 @@ package com.fomjar.net;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fomjar.lang.Task;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -10,6 +11,8 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
@@ -19,6 +22,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class HTTP {
+
+    private static final Logger logger = LoggerFactory.getLogger(HTTP.class);
 
     /**
      * @param <T> {@link JSONObject}、{@link JSONArray}、{@link String}、{@link byte[]}
@@ -146,11 +151,7 @@ public class HTTP {
                     .stream()
                     .map(e -> e.getValue()
                             .stream()
-                            .map(v -> {
-                                try { return URLEncoder.encode(e.getKey(), "utf-8") + "=" + URLEncoder.encode(v, "utf-8"); }
-                                catch (UnsupportedEncodingException unsupportedEncodingException) { unsupportedEncodingException.printStackTrace(); }
-                                return null;
-                            })
+                            .map(v -> Task.catchdo(() -> URLEncoder.encode(e.getKey(), "utf-8") + "=" + URLEncoder.encode(v, "utf-8")))
                             .collect(Collectors.joining("&")))
                     .collect(Collectors.joining("&"));
         }

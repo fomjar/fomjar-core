@@ -4,10 +4,14 @@ import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
 public class RedisDist extends AbstractDist {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisDist.class);
 
     private RedissonClient  redissonClient;
 
@@ -36,7 +40,7 @@ public class RedisDist extends AbstractDist {
     @Override
     public boolean lock(String name, long wait, long hold, TimeUnit unit) {
         try { return this.getLock(name).tryLock(wait, hold, unit); }
-        catch (InterruptedException e) { e.printStackTrace(); }
+        catch (InterruptedException e) { logger.warn("Lock({}) was interrupted.", name, e); }
         return false;
     }
 

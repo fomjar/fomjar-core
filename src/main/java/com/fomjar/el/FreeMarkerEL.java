@@ -4,6 +4,8 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -16,6 +18,8 @@ import java.util.UUID;
  * @author fomjar
  */
 public class FreeMarkerEL extends AbstractEL {
+
+    private static final Logger logger = LoggerFactory.getLogger(FreeMarkerEL.class);
 
     private BeansWrapper            beansWrapper;
     private Configuration           configuration;
@@ -37,24 +41,24 @@ public class FreeMarkerEL extends AbstractEL {
 
     @Override
     public EL register(String name, Class<?> clazz) {
-        try {return this.register(name, this.beansWrapper.getStaticModels().get(clazz.getName()));}
-        catch (TemplateModelException e) {e.printStackTrace();}
+        try { return this.register(name, this.beansWrapper.getStaticModels().get(clazz.getName())); }
+        catch (TemplateModelException e) { logger.error("Register class({}) failed.", clazz.getName(), e); }
         return this;
     }
 
     @Override
     public EL register(String name, Method method) {
         return this.register(name, (TemplateMethodModelEx) args -> {
-            try {return method.invoke(null, this.decodeArgs(args));}
-            catch (Exception e) {throw new TemplateModelException(e);}
+            try { return method.invoke(null, this.decodeArgs(args)); }
+            catch (Exception e) { throw new TemplateModelException(e); }
         });
     }
 
     @Override
     public EL register(String name, ELMethod method) {
         return this.register(name, (TemplateMethodModelEx) args -> {
-            try {return method.invoke(this.decodeArgs(args));}
-            catch (Exception e) {throw new TemplateModelException(e);}
+            try { return method.invoke(this.decodeArgs(args)); }
+            catch (Exception e) { throw new TemplateModelException(e); }
         });
     }
 
@@ -78,7 +82,7 @@ public class FreeMarkerEL extends AbstractEL {
                 this.templateLoader.removeTemplate(name);
                 this.configuration.clearTemplateCache();
             } catch (IOException | TemplateException e) {
-                throw new RuntimeException("evaluate expression failed: " + exp, e);
+                throw new RuntimeException("Evaluate expression failed: " + exp, e);
             }
         }
 

@@ -1,5 +1,9 @@
 package com.fomjar.lio;
 
+import com.fomjar.lang.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -13,6 +17,8 @@ import java.util.Map;
  * @author fomjar
  */
 public abstract class LIO {
+
+    private static final Logger logger = LoggerFactory.getLogger(LIO.class);
 
     private List<LIOReader>         readers = new LinkedList<>();
     private ByteArrayOutputStream   buffers = new ByteArrayOutputStream();
@@ -118,10 +124,11 @@ public abstract class LIO {
         }
 
         if (0 < len) {
-            for (LIOReader reader : this.readers) {
-                try {reader.read(buf, off, len);}
-                catch (Exception e) {e.printStackTrace();}
-            }
+            byte[] finalBuf = buf;
+            int finalOff = off;
+            int finalLen = len;
+            for (LIOReader reader : this.readers)
+                Task.catchdo(() -> reader.read(finalBuf, finalOff, finalLen));
         }
     }
 

@@ -15,10 +15,10 @@ public class SingleThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r) {
-        return ((Func<Thread>) (args) -> {
+        return Task.catchdo(() -> {
             Thread t = new Thread(r, this.name);
             t.setDaemon(true);
             return t;
-        }).call();
+        });
     }
 }

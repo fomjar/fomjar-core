@@ -1,5 +1,6 @@
 package com.fomjar.lio;
 
+import com.fomjar.lang.Task;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -41,14 +42,15 @@ public class WebSocketLIOServer extends LIOServer {
     @Override
     public LIOServer shutdown() {
         if (null != this.server) {
-            try {
+            Task.catchdo(() -> {
                 this.handler.shutdown();
                 this.server.stop();
 
                 this.handler = null;
                 this.server = null;
-            }
-            catch (Exception e) {e.printStackTrace();}
+
+                return 0;
+            });
         }
         return this;
     }

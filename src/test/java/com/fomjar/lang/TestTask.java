@@ -1,18 +1,17 @@
 package com.fomjar.lang;
 
-import com.fomjar.lang.Async;
 import org.junit.Test;
 
 import java.util.concurrent.Future;
 
-public class TestAsyncStatic {
+public class TestTask {
 
     @Test
     public void testAsync() {
-        Async.async(() -> {
+        Task.async(() -> {
             System.out.println(Thread.currentThread().getName() + " : async : " + System.currentTimeMillis());
         });
-        Async.async(() -> {
+        Task.async(() -> {
             System.out.println(Thread.currentThread().getName() + " : async : " + System.currentTimeMillis());
             return 0;
         });
@@ -20,10 +19,10 @@ public class TestAsyncStatic {
 
     @Test
     public void testDelay() {
-        Async.delay(() -> {
+        Task.delay(() -> {
             System.out.println(Thread.currentThread().getName() + " : delay : " + System.currentTimeMillis());
         }, 100);
-        Async.delay(() -> {
+        Task.delay(() -> {
             System.out.println(Thread.currentThread().getName() + " : delay : " + System.currentTimeMillis());
             return 0;
         }, 100);
@@ -31,13 +30,13 @@ public class TestAsyncStatic {
 
     @Test
     public void testLoop() throws InterruptedException {
-        Future<?> f1 = Async.loop(() -> {
+        Future<?> f1 = Task.loop(() -> {
             System.out.println(Thread.currentThread().getName() + " : loop1 : " + System.currentTimeMillis());
         }, 500L);
-        Future<?> f2 = Async.loop(() -> {
+        Future<?> f2 = Task.loop(() -> {
             System.out.println(Thread.currentThread().getName() + " : loop2 : " + System.currentTimeMillis());
         }, 300L);
-        Future<?> f3 = Async.loop(() -> {
+        Future<?> f3 = Task.loop(() -> {
             System.out.println(Thread.currentThread().getName() + " : loop3 : " + System.currentTimeMillis());
         }, 100L);
 
@@ -52,7 +51,7 @@ public class TestAsyncStatic {
 
     @Test
     public void testCron() throws InterruptedException {
-        Future<?> f = Async.loop(() -> {
+        Future<?> f = Task.loop(() -> {
             System.out.println(Thread.currentThread().getName() + " : cron : " + System.currentTimeMillis());
         }, "0/2 * * * * ?");
         Thread.sleep(9000L);

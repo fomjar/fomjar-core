@@ -6,6 +6,8 @@ import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +17,8 @@ import java.util.concurrent.TimeUnit;
  * @author fomjar
  */
 public class RedisMQ extends MQ {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisMQ.class);
 
     /** redis主机 */
     private String  host;
@@ -83,15 +87,14 @@ public class RedisMQ extends MQ {
 
     @Override
     protected boolean lock(String msg) {
-        try {return this.redisson.getLock(msg).tryLock(0, 1, TimeUnit.HOURS);}
-        catch (InterruptedException e) {e.printStackTrace();}   // never happen
+        try { return this.redisson.getLock(msg).tryLock(0, 1, TimeUnit.HOURS); }
+        catch (InterruptedException e) { logger.warn("Message lock was interrupted", e); }   // never happen
         return false;
     }
 
     @Override
-    protected MQ doProduce(MQMsg msg) {
+    protected void doProduce(MQMsg msg) {
         this.redisson.getTopic(this.topic(), this.codec).publish(msg.toString());
-        return this;
     }
 
     @Override

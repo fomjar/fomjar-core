@@ -1,5 +1,9 @@
 package com.fomjar.mq;
 
+import com.fomjar.lang.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 /**
@@ -8,6 +12,8 @@ import java.util.*;
  * @author fomjar
  */
 public abstract class MQ {
+
+    private static final Logger logger = LoggerFactory.getLogger(MQ.class);
 
     /** 主题 */
     private String                      topic;
@@ -56,23 +62,24 @@ public abstract class MQ {
         // process transaction message first
         if (null != msg.transaction()) {
             if (this.transactions.containsKey(msg.transaction())) {
-                try {this.transactions.remove(msg.transaction()).consume(msg);}
-                catch (Exception e) {e.printStackTrace();}
+                logger.info("[MQ CONSUME] - {} : {} transaction: {}", msg.tag(), msg.id(), msg.transaction());
+                Task.catchdo(() -> this.transactions.remove(msg.transaction()).consume(msg));
             }
+
             return;
         }
         // process general message second
-        try {
+        Task.catchdo(() -> {
             if (this.lock(String.format("MESSAGE[%s]-consumed-by-GROUP[%s]", msg.id(), this.group()))) {
                 String tag = msg.tag();
                 if (this.tasks.containsKey(tag)) {
+                    logger.info("[MQ CONSUME] - {} : {}", msg.tag(), msg.id());
                     for (MQTask task : this.tasks.get(tag)) {
-                        try {task.consume(msg);}
-                        catch (Exception e) {e.printStackTrace();}
+                        Task.catchdo(() -> task.consume(msg));
                     }
                 }
             }
-        } catch (Exception e) {e.printStackTrace();}
+        });
     }
 
     /**
@@ -130,7 +137,9 @@ public abstract class MQ {
             this.transactions.put(msg.transaction(), task);
         }
 
-        return this.doProduce(msg);
+        this.doProduce(msg);
+        logger.info("[MQ PRODUCE] - {} : {}", msg.tag(), msg.id());
+        return this;
     }
 
     /**
@@ -139,7 +148,7 @@ public abstract class MQ {
      * @param msg 待生产的消息
      * @return 此MQ对象
      */
-    protected abstract MQ doProduce(MQMsg msg);
+    protected abstract void doProduce(MQMsg msg);
 
     /**
      * 关闭MQ客户端。
