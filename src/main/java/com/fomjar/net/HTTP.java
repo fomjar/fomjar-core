@@ -67,15 +67,14 @@ public class HTTP {
                 .url(url)
                 .body(body)
                 .post(response);
-
     }
 
     private static final PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
     private static final HttpClientBuilder builder = HttpClients.custom();
 
     static {
-        HTTP.manager.setMaxTotal(1000);
-        HTTP.manager.setDefaultMaxPerRoute(100);
+        HTTP.manager.setMaxTotal(10000);
+        HTTP.manager.setDefaultMaxPerRoute(1000);
         HTTP.builder.setConnectionManager(HTTP.manager);
     }
 
