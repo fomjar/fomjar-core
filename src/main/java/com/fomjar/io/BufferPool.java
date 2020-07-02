@@ -34,8 +34,8 @@ public class BufferPool {
         this.lock       = new ReentrantLock();
     }
 
-    public void write(String string) throws UnsupportedEncodingException {
-        this.write(string.getBytes(this.charset));
+    public BufferPool write(String string) throws UnsupportedEncodingException {
+        return this.write(string.getBytes(this.charset));
     }
 
     public BufferPool write(InputStream is) {
@@ -47,17 +47,16 @@ public class BufferPool {
         return this;
     }
 
-    public void write(byte[] buf) {
-        this.write(buf, 0, buf.length);
-    }
+    public BufferPool write(byte[] buf) { return this.write(buf, 0, buf.length); }
 
-    public void write(byte[] buf, int off, int len) {
+    public BufferPool write(byte[] buf, int off, int len) {
         try {
             this.lock.lock();
             this.baos.write(buf, off, len);
         } finally {
             this.lock.unlock();
         }
+        return this;
     }
 
     public String[] readLines() throws UnsupportedEncodingException {

@@ -5,12 +5,9 @@
 
 ## 目录
 
-- *algo*: 算法包。md2、md5、sha1、sha256、sha384、sha512、crc32
-- *anno*: 注解包。注解扫描，对Spring环境下地自定义注解地初始化处理很有帮助
-- *async*: 异步包。异步执行、队列化执行等。在Spring环境下会进行Bean的自动配置
-- *data*: 数据结构包。对数据结构的特殊处理。对字段和方法的方便的反射操作，修改final常量值，类的自定义扫描，集合的方便地链式调用等
-- *dist*: 分布式包。各类分布式中间件的统一封装。在Spring环境下会进行Bean的自动配置。分布式锁、分布式调度
+- *dist*: 分布式包。各类分布式中间件的统一封装。在Spring环境下会进行Bean的自动配置。分布式锁、选举等
 - *el*: 表达式包。各类模板引擎和表达式引擎的统一封装。也可以用来做Web端推送。在Spring环境下会进行Bean的自动配置。支持注册自定义变量、自定义方法
+- *lang*: 基础功能宝。包括：算法摘要、注解扫描、异步任务、数据结构等
 - *lio*: 长连接包。各类网络协议的长连接的统一封装。在Spring环境下提供了基于注解的LIO容器自动配置。Websocket、Socket-IO、TCP、Redis
 - *mq*: 消息队列包。各类消息中间件的统一封装。在Spring环境下会进行Bean的自动配置。AliyunMQ、RedisMQ
 - *oss*: 对象存储包。各类对象存储中间件的统一封装。在Spring环境下会进行Bean的自动配置。AliyunOSS、MinioOSS
@@ -22,19 +19,18 @@
 <dependency>
     <groupId>com.fomjar</groupId>
     <artifactId>fomjar-core</artifactId>
-    <version>1.0</version>
+    <version>1.0.5</version>
 </dependency>
 ```
 
 ## DEMO
 
-### algo(算法)
+### lang(基础功能)
+
 支持的摘要算法：md2、md5、sha1、sha256、sha384、sha512、crc32。
 ```java
 System.out.println(Digest.md5("password"));
 ```
-
-### anno(注解)
 简单的注解扫描
 ```java
 Anno.scan("com.fomjar.core", new AnnoScanAdapter() {
@@ -88,45 +84,35 @@ Anno.scan(new URLClassLoader(new URL[]{
             }
         });
 ```
-
-### async(异步)
 异步工具库对异步执行操作做了优化，对系统整体性能有较好的提升。
 ```java
-
-
 // 异步执行
-async(() -> {
+Task.async(() -> {
     System.out.println(Thread.currentThread().getName() + ": " + System.currentTimeMillis());
 });
-// 异步队列执行，默认在主异步队列中执行
-queue(() -> {
+// 延迟任务
+Task.delay(() -> {
     System.out.println(Thread.currentThread().getName() + ": " + System.currentTimeMillis());
-});
-// 异步线程池执行
-pool(() -> {
+}, 1000L);
+// 循环任务
+Task.loop(() -> {
     System.out.println(Thread.currentThread().getName() + ": " + System.currentTimeMillis());
-});
+}, "0/2 * * * * ?");
 ```
 Spring下的异步支持：
 ```java
 @Autowired
-private ExecutorService queue;
+private ExecutorService pool;
 
 for (int i = 0; i < 8; i++) {
     final int n = i;
-    this.queue.submit(() -> {
+    this.pool.submit(() -> {
         try {Thread.sleep(100L);}
         catch (InterruptedException e) {e.printStackTrace();}
         System.out.println(Thread.currentThread().getName() + ": " + n);
     });
 }
-this.queue.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-```
-
-### data(数据结构)
-集合操作：
-```java
-Struct.wrapList().add(3).add(4).add(5).get().size(); // 3
+this.pool.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 ```
 数据结构访问：
 ```java
@@ -144,16 +130,21 @@ Struct.setFinalObject(s, "value", new char[] {'a', 'b', 'c', 'd', 'e'}); // "abc
 
 ### dist(分布式)
 目前支持基于Redis的实现。
-分布式调度：
+主机选举：
 ```java
 @Autowired
 private Dist dist;
 
-String timerName = "loop-a-123";
-this.dist.revoke("loop-a-"); // 旧任务清理，确保服务在多实例部署的情况下只有一个任务在运行
-this.dist.loop((Runnable & Serializable) () ->
-                System.out.println(Thread.currentThread().getName() + "-loop-a-" + System.currentTimeMillis()),
-        timerName, 100, 1000, TimeUnit.MILLISECONDS); // 发布定时任务
+this.dist.elect("Some-Topic", new Election() {
+    @Override
+    public void elected(String topic) {
+        System.out.println("Elected");
+    }
+    @Override
+    public void lost(String topic) {
+        System.out.println("Lost");
+    }
+});
 ```
 分布式锁：
 ```java
@@ -165,7 +156,7 @@ this.dist.lock(() -> {
     System.out.println(Thread.currentThread().getName() + ": " + System.currentTimeMillis());
     try { Thread.sleep(100L); }
     catch (InterruptedException e) { e.printStackTrace(); }
-}, name);
+}, name， 3000L);
 ```
 
 ### el(表达式)

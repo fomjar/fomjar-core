@@ -11,6 +11,7 @@ import java.lang.annotation.*;
  *     <li>{@link byte[]}: 收到的客户端发送的字节数据</li>
  *     <li>{@link String}: 收到的客户端发送的字符串数据</li>
  *     <li>{@link com.alibaba.fastjson.JSONObject}: 收到的客户端发送的JSON数据</li>
+ *     <li>{@link com.alibaba.fastjson.JSONArray}: 收到的客户端发送的JSON数据</li>
  * </ul>
  * 当该标记方法包含返回值时容器将自动返回此值到客户端。
  *

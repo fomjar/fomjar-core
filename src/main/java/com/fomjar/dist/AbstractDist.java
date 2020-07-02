@@ -44,14 +44,14 @@ public abstract class AbstractDist implements Dist {
                             // 早已当选
                         } else {
                             // 新当选
-                            logger.error("[Election] Elected for: {}", topic);
+                            logger.error("[ELECTION] Elected for: {}", topic);
                             this.electionMy.put(topic, election);
                             election.elected(topic);
                         }
                     } else {
                         if (this.electionMy.containsKey(topic)) {
                             // 落选
-                            logger.error("[Election] Lost for: {}", topic);
+                            logger.error("[ELECTION] Lost for: {}", topic);
                             this.electionMy.remove(topic).lost(topic);
                         } else {
                             // 早已落选

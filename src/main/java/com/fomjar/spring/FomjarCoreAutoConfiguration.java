@@ -1,5 +1,6 @@
 package com.fomjar.spring;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fomjar.lang.Anno;
 import com.fomjar.lang.AnnoScanAdapter;
@@ -40,6 +41,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
@@ -205,6 +207,10 @@ public class FomjarCoreAutoConfiguration {
                                     if (JSONObject.class.isAssignableFrom(method.getParameterTypes()[i])
                                             || Map.class.isAssignableFrom(method.getParameterTypes()[i])) {
                                         parameters[i] = JSONObject.parseObject(new String(buf, off, len));
+                                    }
+                                    if (JSONArray.class.isAssignableFrom(method.getParameterTypes()[i])
+                                            || List.class.isAssignableFrom(method.getParameterTypes()[i])) {
+                                        parameters[i] = JSONArray.parseArray(new String(buf, off, len));
                                     }
                                 }
                                 Task.catchdo(() -> {

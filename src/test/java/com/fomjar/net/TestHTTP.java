@@ -1,39 +1,50 @@
 package com.fomjar.net;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fomjar.io.BufferPool;
+import com.fomjar.io.TestBufferPool;
 import org.junit.Test;
+import org.w3c.dom.Document;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 public class TestHTTP {
 
     @Test
     public void testString() throws IOException {
-        HTTP.open()
-                .url("www.baidu.com")
-                .get((Map<String, String> head, String body) -> {
+        HTTP.get("www.baidu.com", (Map<String, String> head, String body) -> {
             System.out.println(body);
         });
     }
 
     @Test
+    public void testInputStream() throws IOException {
+        HTTP.get("www.baidu.com", (Map<String, String> head, InputStream body) -> {
+            try { System.out.println(new BufferPool().write(body).readString()); }
+            catch (UnsupportedEncodingException e) { e.printStackTrace(); }
+        });
+    }
+
+    @Test
+    public void testDocument() throws IOException {
+        HTTP.get("www.baidu.com", (Map<String, String> head, Document body) -> {
+            System.out.println(body.toString());
+        });
+    }
+
+    @Test
     public void testJSONget() throws IOException {
-        HTTP.open()
-                .url("https://www.baidu.com/sugrec")
-                .param("from", "pc_web")
-                .param("json", "1")
-                .get((Map<String, String> head, JSONObject body) -> {
+        HTTP.get("https://www.baidu.com/sugrec?from=pc_web&json=1", (Map<String, String> head, JSONObject body) -> {
             System.out.println(body);
         });
     }
 
     @Test
     public void testJSONpost() throws IOException {
-        HTTP.open()
-                .url("ynuf.alipay.com/service/um.json")
-                .body("123123")
-                .post((Map<String, String> head, JSONObject body) -> {
+        HTTP.post("ynuf.alipay.com/service/um.json", "123123", (Map<String, String> head, JSONObject body) -> {
             System.out.println(body);
         });
     }
