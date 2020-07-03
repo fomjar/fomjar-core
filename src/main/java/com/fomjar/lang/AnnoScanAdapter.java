@@ -13,22 +13,22 @@ import java.lang.reflect.Parameter;
 public abstract class AnnoScanAdapter implements AnnoScanReader {
 
     @Override
-    public void read(Annotation[] annotations, Class<?> clazz) throws Exception {
+    public void read(Annotation[] annotations, Class<?> clazz) {
 
     }
 
     @Override
-    public void read(Annotation[] annotations, Class<?> clazz, Method method) throws Exception {
+    public void read(Annotation[] annotations, Class<?> clazz, Method method) {
 
     }
 
     @Override
-    public void read(Annotation[] annotations, Class<?> clazz, Method method, Parameter parameter) throws Exception {
+    public void read(Annotation[] annotations, Class<?> clazz, Method method, Parameter parameter) {
 
     }
 
     @Override
-    public void read(Annotation[] annotations, Class<?> clazz, Field field) throws Exception {
+    public void read(Annotation[] annotations, Class<?> clazz, Field field) {
 
     }
 

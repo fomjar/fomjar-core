@@ -1,9 +1,5 @@
 package com.fomjar.lang;
 
-import com.fomjar.lang.Anno;
-import com.fomjar.lang.AnnoScanAdapter;
-import com.fomjar.lang.AnnoScanFilter;
-import com.fomjar.lang.Struct;
 import org.junit.Test;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -23,7 +20,7 @@ import java.net.URLClassLoader;
 public class TestAnnoStatic {
 
     @Test
-    public void testScanSelf() throws Exception {
+    public void testScanSelf() throws IOException {
         Anno.scan("com.fomjar.core", new AnnoScanAdapter() {
 
             @Override
@@ -65,9 +62,8 @@ public class TestAnnoStatic {
         });
     }
 
-    @SuppressWarnings("unchecked")
 //    @Test
-    public void testScanController() throws Exception {
+    public void testScanController() throws IOException {
         Anno.scan(new URLClassLoader(new URL[]{
                         new File("/Users/fomjar/Documents/work/code/df/df-common/target/classes").toURI().toURL(),
                         new File("/Users/fomjar/Documents/work/code/df/df-iot/target/classes").toURI().toURL(),

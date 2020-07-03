@@ -12,12 +12,12 @@ import java.lang.reflect.Parameter;
  */
 public interface AnnoScanReader {
 
-    void read(Annotation[] annotations, Class<?> clazz) throws Exception;
+    void read(Annotation[] annotations, Class<?> clazz);
 
-    void read(Annotation[] annotations, Class<?> clazz, Method method) throws Exception;
+    void read(Annotation[] annotations, Class<?> clazz, Method method);
 
-    void read(Annotation[] annotations, Class<?> clazz, Method method, Parameter parameter) throws Exception;
+    void read(Annotation[] annotations, Class<?> clazz, Method method, Parameter parameter);
 
-    void read(Annotation[] annotations, Class<?> clazz, Field field) throws Exception;
+    void read(Annotation[] annotations, Class<?> clazz, Field field);
 
 }

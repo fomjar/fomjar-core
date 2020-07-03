@@ -20,7 +20,7 @@ public abstract class Anno {
      * @param reader 读取器
      * @throws IOException 读取失败
      */
-    public static void scan(String pack, AnnoScanReader reader) throws Exception {
+    public static void scan(String pack, AnnoScanReader reader) throws IOException {
         Anno.scan(Anno.class.getClassLoader(), pack, null, null, reader);
     }
 
@@ -32,7 +32,7 @@ public abstract class Anno {
      * @param reader 读取器
      * @throws IOException 读取失败
      */
-    public static void scan(ClassLoader loader, String pack, AnnoScanReader reader) throws Exception {
+    public static void scan(ClassLoader loader, String pack, AnnoScanReader reader) throws IOException {
         Anno.scan(loader, pack, null, null, reader);
     }
 
@@ -45,7 +45,7 @@ public abstract class Anno {
      * @param reader 读取器
      * @throws IOException 读取失败
      */
-    public static void scan(String pack, StructScanFilter structScanFilter, AnnoScanFilter annoScanFilter, AnnoScanReader reader) throws Exception {
+    public static void scan(String pack, StructScanFilter structScanFilter, AnnoScanFilter annoScanFilter, AnnoScanReader reader) throws IOException {
         Anno.scan(Anno.class.getClassLoader(), pack, structScanFilter, annoScanFilter, reader);
     }
 
@@ -59,31 +59,31 @@ public abstract class Anno {
      * @param reader 读取器
      * @throws IOException 读取失败
      */
-    public static void scan(ClassLoader loader, String pack, StructScanFilter structScanFilter, AnnoScanFilter annoScanFilter, AnnoScanReader reader) throws Exception {
+    public static void scan(ClassLoader loader, String pack, StructScanFilter structScanFilter, AnnoScanFilter annoScanFilter, AnnoScanReader reader) throws IOException {
         Struct.scan(loader, pack, structScanFilter, new StructScanReader() {
             @Override
-            public void read(Class<?> type) throws Exception {
+            public void read(Class<?> type) {
                 if (null != annoScanFilter && !annoScanFilter.filter(type.getAnnotations()))
                     return;
 
                 reader.read(type.getAnnotations(), type);
             }
             @Override
-            public void read(Class<?> type, Method method) throws Exception {
+            public void read(Class<?> type, Method method) {
                 if (null != annoScanFilter && !annoScanFilter.filter(type.getAnnotations()))
                     return;
 
                 reader.read(method.getAnnotations(), type, method);
             }
             @Override
-            public void read(Class<?> type, Method method, Parameter parameter) throws Exception {
+            public void read(Class<?> type, Method method, Parameter parameter) {
                 if (null != annoScanFilter && !annoScanFilter.filter(type.getAnnotations()))
                     return;
 
                 reader.read(parameter.getAnnotations(), type, method, parameter);
             }
             @Override
-            public void read(Class<?> type, Field field) throws Exception {
+            public void read(Class<?> type, Field field) {
                 if (null != annoScanFilter && !annoScanFilter.filter(type.getAnnotations()))
                     return;
 

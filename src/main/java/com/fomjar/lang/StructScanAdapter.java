@@ -11,18 +11,18 @@ import java.lang.reflect.Parameter;
 public abstract class StructScanAdapter implements StructScanReader {
 
     @Override
-    public void read(Class<?> type) throws Exception {
+    public void read(Class<?> type) {
     }
 
     @Override
-    public void read(Class<?> type, Method method) throws Exception {
+    public void read(Class<?> type, Method method) {
     }
 
     @Override
-    public void read(Class<?> type, Method method, Parameter parameter) throws Exception {
+    public void read(Class<?> type, Method method, Parameter parameter) {
     }
 
     @Override
-    public void read(Class<?> type, Field field) throws Exception {
+    public void read(Class<?> type, Field field) {
     }
 }

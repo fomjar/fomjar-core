@@ -13,8 +13,13 @@ import org.springframework.util.ClassUtils;
 import sun.misc.Unsafe;
 
 import java.io.IOException;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.IntFunction;
 
 /**
@@ -359,7 +364,7 @@ public abstract class Struct {
      * @param reader 读取器
      * @throws IOException 读取失败
      */
-    public static void scan(String pack, StructScanReader reader) throws Exception {
+    public static void scan(String pack, StructScanReader reader) throws IOException {
         Struct.scan(Struct.class.getClassLoader(), pack, null, reader);
     }
 
@@ -371,7 +376,7 @@ public abstract class Struct {
      * @param reader 读取器
      * @throws IOException 读取失败
      */
-    public static void scan(String pack, StructScanFilter filter, StructScanReader reader) throws Exception {
+    public static void scan(String pack, StructScanFilter filter, StructScanReader reader) throws IOException {
         Struct.scan(Struct.class.getClassLoader(), pack, filter, reader);
     }
 
@@ -383,7 +388,7 @@ public abstract class Struct {
      * @param reader 读取器
      * @throws IOException 读取失败
      */
-    public static void scan(ClassLoader loader, String pack, StructScanReader reader) throws Exception {
+    public static void scan(ClassLoader loader, String pack, StructScanReader reader) throws IOException {
         Struct.scan(loader, pack, null, reader);
     }
 
@@ -398,7 +403,7 @@ public abstract class Struct {
      * @param reader 读取器
      * @throws IOException 读取失败
      */
-    public static void scan(ClassLoader loader, String pack, StructScanFilter filter, StructScanReader reader) throws Exception {
+    public static void scan(ClassLoader loader, String pack, StructScanFilter filter, StructScanReader reader) throws IOException {
         String resourcePath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
                 + ClassUtils.convertClassNameToResourcePath(Struct.env.resolveRequiredPlaceholders(pack))
                 + "/**/*.class";
@@ -414,11 +419,11 @@ public abstract class Struct {
                     continue;
 
                 Struct.scan(type, reader);
-            } catch (ClassNotFoundException | NoClassDefFoundError | ExceptionInInitializerError | UnsatisfiedLinkError e) {}
+            } catch (ClassNotFoundException | NoClassDefFoundError | ExceptionInInitializerError | UnsatisfiedLinkError e) { }
         }
     }
 
-    private static void scan(Class<?> type, StructScanReader reader) throws Exception {
+    private static void scan(Class<?> type, StructScanReader reader) {
         // Class-level
         reader.read(type);
 

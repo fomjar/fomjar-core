@@ -10,12 +10,12 @@ import java.lang.reflect.Parameter;
  */
 public interface StructScanReader {
 
-    void read(Class<?> type) throws Exception;
+    void read(Class<?> type);
 
-    void read(Class<?> type, Method method) throws Exception;
+    void read(Class<?> type, Method method);
 
-    void read(Class<?> type, Method method, Parameter parameter) throws Exception;
+    void read(Class<?> type, Method method, Parameter parameter);
 
-    void read(Class<?> type, Field field) throws Exception;
+    void read(Class<?> type, Field field);
 
 }
