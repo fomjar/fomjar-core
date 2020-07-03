@@ -28,14 +28,10 @@ public class RedisDist extends AbstractDist {
         this.redissonClient = redissonClient;
     }
 
-    private RLock getLock(String name) {
-        return this.redissonClient.getLock("dist-lock-" + name);
-    }
+    private RLock getLock(String name) { return this.redissonClient.getLock("dist-lock-" + name); }
 
     @Override
-    public void unlock(String name) {
-        this.getLock(name).forceUnlock();
-    }
+    public void unlock(String name) { this.getLock(name).forceUnlock(); }
 
     @Override
     public boolean lock(String name, long wait, long hold, TimeUnit unit) {
