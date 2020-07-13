@@ -31,8 +31,8 @@ public abstract class MQ {
         this.transactions   = new LinkedHashMap<>();
     }
 
-    public String topic() {return this.topic;}
-    public String group() {return this.group;}
+    public String topic() { return this.topic; }
+    public String group() { return this.group; }
 
     /**
      * 设置所属集群组。消息面向集群组进行广播，一个消息只能被相同集群组内的一个实例所消费。

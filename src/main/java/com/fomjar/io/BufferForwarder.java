@@ -34,6 +34,7 @@ public class BufferForwarder {
     private List<OutputStream>  os;
     private Worker              worker;
     private byte[]              buf;
+    private ByteArrayCounter    counter;
 
 
     public BufferForwarder() {
@@ -47,10 +48,11 @@ public class BufferForwarder {
     }
 
     private void setup() {
-        this.is     = null;
-        this.os     = new LinkedList<>();
-        this.worker = null;
-        this.buf    = null;
+        this.is         = null;
+        this.os         = new LinkedList<>();
+        this.worker     = null;
+        this.buf        = null;
+        this.counter    = null;
     }
 
     public BufferForwarder buffer(int length) {
@@ -65,6 +67,11 @@ public class BufferForwarder {
 
     public BufferForwarder outputs(OutputStream... os) {
         this.os.addAll(Arrays.asList(os));
+        return this;
+    }
+
+    public BufferForwarder counter(ByteArrayCounter counter) {
+        this.counter = counter;
         return this;
     }
 
@@ -105,6 +112,8 @@ public class BufferForwarder {
                         o.write(buf, 0, len);
                         o.flush();
                     }
+                    if (null != BufferForwarder.this.counter)
+                        BufferForwarder.this.counter.notify(buf, 0, len);
                 }
             } catch (IOException e) { logger.warn("Forwarding terminated.", e); }
             finally { BufferForwarder.this.shutdown(); }
