@@ -76,6 +76,7 @@ public class HTTP {
         HTTP.manager.setMaxTotal(10000);
         HTTP.manager.setDefaultMaxPerRoute(1000);
         HTTP.builder.setConnectionManager(HTTP.manager);
+        HTTP.builder.disableContentCompression();
     }
 
     private String url;

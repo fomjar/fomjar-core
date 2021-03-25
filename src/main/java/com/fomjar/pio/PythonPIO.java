@@ -1,6 +1,6 @@
 package com.fomjar.pio;
 
-import com.fomjar.io.BufferPool;
+import com.fomjar.io.Buffers;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class PythonPIO extends PIO {
         File file = new File(PythonPIO.SCRIPT);
         if (!file.isFile()) {
             InputStream is = PythonPIO.class.getResourceAsStream("/" + PythonPIO.SCRIPT);
-            try { new BufferPool().write(is).read(file); }
+            try { new Buffers().write(is).read(file); }
             finally { is.close(); }
         }
         super.startup("python", "-u", PythonPIO.SCRIPT);  // parameter "-u" to force script write it's output to stdout.

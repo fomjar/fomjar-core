@@ -1,18 +1,18 @@
 package com.fomjar.pio;
 
-import com.fomjar.io.BufferPool;
+import com.fomjar.io.Buffers;
 import com.fomjar.lang.Task;
 
 public abstract class PIOLineReader implements PIOReader {
 
-    private BufferPool buffer;
+    private Buffers buffer;
 
     public PIOLineReader() {
-        this.buffer = new BufferPool();
+        this.buffer = new Buffers();
     }
 
     public PIOLineReader(String charset) {
-        this.buffer = new BufferPool(charset);
+        this.buffer = new Buffers(charset);
     }
 
     @Override

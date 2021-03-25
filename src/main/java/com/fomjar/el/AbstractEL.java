@@ -78,13 +78,6 @@ public abstract class AbstractEL implements EL {
                         null != args && 2 <= args.length
                                 ? args[0].toString().split(args[1].toString())
                                 : null)
-                // if (2 > 1, 'true', 'false')
-                .register("if", args ->
-                        null != args && 3 <= args.length
-                                ? (Boolean.valueOf(args[0].toString())
-                                        ? args[1].toString()
-                                        : args[2].toString())
-                                : null)
                 // ifblank ('', 'abcd')
                 .register("ifblank", args ->
                         null != args && 2 <= args.length

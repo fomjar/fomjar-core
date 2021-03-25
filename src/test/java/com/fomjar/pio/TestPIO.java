@@ -1,6 +1,6 @@
 package com.fomjar.pio;
 
-import com.fomjar.io.BufferPool;
+import com.fomjar.io.Buffers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ public class TestPIO {
     @BeforeClass
     public static void setup() throws IOException {
         InputStream is = TestPIO.class.getResourceAsStream("/test.py");
-        new BufferPool().write(is).read(new File("test.py"));
+        new Buffers().write(is).read(new File("test.py"));
         is.close();
 
     }

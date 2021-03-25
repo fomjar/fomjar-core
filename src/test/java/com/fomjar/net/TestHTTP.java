@@ -1,8 +1,7 @@
 package com.fomjar.net;
 
 import com.alibaba.fastjson.JSONObject;
-import com.fomjar.io.BufferPool;
-import com.fomjar.io.TestBufferPool;
+import com.fomjar.io.Buffers;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -23,7 +22,7 @@ public class TestHTTP {
     @Test
     public void testInputStream() throws IOException {
         HTTP.get("www.baidu.com", (Map<String, String> head, InputStream body) -> {
-            try { System.out.println(new BufferPool().write(body).readString()); }
+            try { System.out.println(new Buffers().write(body).readString()); }
             catch (UnsupportedEncodingException e) { e.printStackTrace(); }
         });
     }

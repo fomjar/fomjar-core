@@ -1,6 +1,5 @@
 package com.fomjar.el;
 
-import com.fomjar.lang.Task;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.AviatorEvaluatorInstance;
 import com.googlecode.aviator.runtime.function.AbstractVariadicFunction;

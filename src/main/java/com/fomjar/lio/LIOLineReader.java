@@ -1,18 +1,18 @@
 package com.fomjar.lio;
 
-import com.fomjar.io.BufferPool;
+import com.fomjar.io.Buffers;
 import com.fomjar.lang.Task;
 
 public abstract class LIOLineReader implements LIOReader {
 
-    private BufferPool channel;
+    private Buffers channel;
 
     public LIOLineReader() {
-        this.channel = new BufferPool();
+        this.channel = new Buffers();
     }
 
     public LIOLineReader(String charset) {
-        this.channel = new BufferPool(charset);
+        this.channel = new Buffers(charset);
     }
 
     @Override

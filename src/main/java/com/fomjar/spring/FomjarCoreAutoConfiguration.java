@@ -181,12 +181,12 @@ public class FomjarCoreAutoConfiguration {
             private Map<String, Object> controllers = new HashMap<>();
 
             @Override
-            public void read(Annotation[] annotations, Class<?> clazz) throws Exception {
-                this.controllers.putIfAbsent(clazz.getName(), clazz.newInstance());
+            public void read(Annotation[] annotations, Class<?> clazz) {
+                Task.catchdo(() -> this.controllers.putIfAbsent(clazz.getName(), clazz.newInstance()));
             }
 
             @Override
-            public void read(Annotation[] annotations, Class<?> clazz, Method method) throws Exception {
+            public void read(Annotation[] annotations, Class<?> clazz, Method method) {
                 Object controller = this.controllers.get(clazz.getName());
                 if (null != Anno.any(annotations, LIORequest.class)) {
                     finalServer.listen(new LIOServerListener() {

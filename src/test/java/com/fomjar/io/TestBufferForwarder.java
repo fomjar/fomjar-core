@@ -13,7 +13,7 @@ public class TestBufferForwarder {
     public void test() throws IOException, ExecutionException, InterruptedException {
         try (InputStream is = TestBufferForwarder.class.getResourceAsStream("/pio.py")) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            BufferForwarder.forward(is, baos).get();
+            Buffers.forward(is, baos).get();
             System.out.println(baos.toString());
         }
     }

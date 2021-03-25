@@ -32,13 +32,12 @@ public class TestEL {
         System.out.println(this.el.eval("substring('abcde', 3)"));
         System.out.println(this.el.eval("replace('abcde', 'c', 'm')"));
         System.out.println(this.el.eval("split('abcde', 'c')[0]"));
-        System.out.println(this.el.eval("if(1 > 0, 'g', 'l')"));
         System.out.println(this.el.eval("ifblank('', 'abcd')"));
         System.out.println(this.el.eval("ifblank('1234', 'abcd')"));
         System.out.println(this.el.eval("Math.PI"));
         System.out.println(this.el.eval("Math.E"));
-        System.out.println(this.el.eval("Math.abs(-15)"));
-        System.out.println(this.el.eval("Math.sqrt(2)"));
+//        System.out.println(this.el.eval("Math.abs(-15)"));
+//        System.out.println(this.el.eval("Math.sqrt(2)"));
     }
 
     @Test
