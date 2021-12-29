@@ -22,12 +22,21 @@ public abstract class AbstractDist implements Dist {
     public void elect(String topic, Election election) {
         this.electionAll.put(topic, election);
 
-        if (null == this.electionTask)
-            this.startElectTask();
+        if (null == this.electionTask) {
+            synchronized (this) {
+                if (null == this.electionTask) {
+                    this.startElectTask();
+                }
+            }
+        }
     }
 
     private void startElectTask() {
         this.electionTask = Task.loop(() -> {
+            // 无选举项
+            if (null == this.electionTask)
+                return;
+
             // 无选举项，直接清理退出
             if (this.electionAll.isEmpty()) {
                 this.electionMy.clear();
